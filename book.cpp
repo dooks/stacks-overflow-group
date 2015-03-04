@@ -6,6 +6,7 @@ using std::string;
 Book::Book() {}
 Book::~Book() {}
 
+void Book::setFileIndex(unsigned idx) { m_index = idx;     }
 void Book::setISBN  (string isbn)    { m_isbn = isbn; }
 void Book::setTitle (string title)   { m_title = title; }
 void Book::setAuthor(string author)  { m_author = author; }
@@ -25,6 +26,7 @@ void Book::setRandom()  {
   // Set random retail price
 }
 
+unsigned Book::getFileIndex() { return m_index;       }
 string Book::getISBN()        { return m_isbn;        }
 string Book::getTitle()       { return m_title;       }
 string Book::getAuthor()      { return m_author;      }

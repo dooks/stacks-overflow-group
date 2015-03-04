@@ -5,7 +5,7 @@ using std::string;
 #include "date.h"
 
 class Book {
-  int    m_index;
+  unsigned m_index;
 
   string m_isbn;
   string m_title;
@@ -23,6 +23,7 @@ public:
   ~Book();
 
   // Mutators
+  void setFileIndex(unsigned);
   void setISBN(string);
   void setTitle(string);
   void setAuthor(string);
@@ -31,6 +32,7 @@ public:
   void setRandom();
 
   // Accessors
+  unsigned getFileIndex();
   string getISBN(void);
   string getTitle(void);
   string getAuthor(void);
