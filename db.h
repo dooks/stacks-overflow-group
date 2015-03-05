@@ -41,9 +41,9 @@ namespace DB {
 
     // Internal Methods
     int write(Book*, bool); // Write book into record used/unused
-    void checkUnused(); // Read entire db file for unused records
-    void seekb(unsigned);  // Set cursor to record from beginning
-    void seekr(unsigned);  // Set cursor to record relative
+    void checkUnused();     // Read entire db file for unused records
+    void seekb(unsigned);   // Set cursor to record from beginning
+    void seekr(int);        // Set cursor to record relative
     bool clean();
 
   public:
@@ -54,7 +54,7 @@ namespace DB {
     bool isOpen();
     int  add(Book*);
     bool read(Book*);
-    bool  remove(Book*); // Mark record as unused
+    bool remove(Book*); // Mark record as unused
     bool close();
     bool eof();
   };
