@@ -48,9 +48,10 @@ namespace DB {
 
     } else {
       // File is empty
-      m_file->clear();
-      m_dbSize = 0;
+      m_file->clear(); // EOF was reached, make sure to clear error bits
+
       // Write header
+      m_dbSize = 0;
       m_file->write(reinterpret_cast<char*>(&m_dbSize), sizeof(unsigned));
       if(m_file->fail()) throw runtime_error("Failed to write to " + filename);
 
@@ -59,7 +60,7 @@ namespace DB {
     }
 
     } catch(exception& e) {
-      cerr << "Local::open() -- Exception: " << e.what() << endl;
+      cerr << "Local::open(): " << e.what() << endl;
       if(m_file != NULL) {
         m_file->close();
         delete m_file;
@@ -75,32 +76,38 @@ namespace DB {
   }
 
   int Local::add(Book* book) {
-    // If book is invalid
-    if(book == NULL) {
-      // TODO: exception handling
+    try {
+      // If book is invalid
+      if(book   == NULL) throw domain_error("Domain Error: Argument is NULL");
+      if(m_file == NULL) throw logic_error("Database not open");
+
+      unsigned index = 0;
+      if(!m_unusedIndex.empty()) {
+        // If an element of unused indices exist
+        index = m_unusedIndex.front(); // Assign first index to temp var
+        m_unusedIndex.pop(); // Pop first element of unused indices list
+        book->setFileIndex(index); // Assign index to book
+        seekb(index); // Set cursor to record at index
+        write(book, true); // Write book with used flag
+
+      } else {
+        // No unused indices... append to file instead
+        // Increase size of db by one
+        index = m_dbSize += 1;
+        m_file->seekp(0, ios::beg); // Set cursor to beginning of file
+        m_file->write(reinterpret_cast<char*>(&m_dbSize), sizeof(unsigned));
+        if(m_file->fail()) throw runtime_error("Failed to write to database");
+
+        // Append book
+        m_file->seekp(0, ios::end); // Set cursor to end of file
+        write(book, true); // Write book with used flag
+        //m_file->clear(); // Clear EOF flag? necessary?
+      }
+      return index;
+    } catch(exception& e) {
+      cerr << "Local::add(): " << e.what() << endl;
       return -1;
     }
-
-    unsigned index = 0;
-    // If an element of unused indices exist
-    if(!m_unusedIndex.empty()) {
-      index = m_unusedIndex.front(); // Assign first index to temp var
-      m_unusedIndex.pop(); // Pop first element of unused indices list
-      book->setFileIndex(index); // Assign index to book
-      seekb(index); // Set cursor to record at index
-      write(book, true); // Write book with used flag
-    } else {
-      // Increase size of db by one
-      index = m_dbSize += 1;
-      m_file->seekp(0); // Set cursor to beginning of file
-      m_file->write(reinterpret_cast<char*>(&m_dbSize), sizeof(unsigned));
-
-      // Append book
-      m_file->seekp(0, ios::end); // Set cursor to end of file
-      write(book, true); // Write book with used flag
-      //m_file->clear(); // Clear EOF flag? necessary?
-    }
-    return index;
   }
 
   bool Local::read(Book* book) {
@@ -133,15 +140,19 @@ namespace DB {
   }
 
   bool Local::close() {
-    // if m_open is false
+    try {
     if(m_file == NULL) {
-      // Throw exception? or ignore
-      return false;
+      throw runtime_error("Runtime Error: No database open");
     } else {
       m_file->close(); // Close db file
       delete m_file;
       m_file = NULL;
       return true;
+    }
+    } catch(exception &e) {
+      cerr << "Local::close(): " << e.what() << endl;
+      throw e;
+      return false;
     }
   }
 
@@ -151,22 +162,30 @@ namespace DB {
 
   // Internal methods
   void Local::checkUnused() {
-    if(isOpen()) {
-      try { seekb(0); /* Seek to first record */ }
-      catch(const out_of_range& oor) {
-        cerr << "Local::checkUnused(): " << oor.what() << endl;
+    try {
+      if(isOpen()) {
+        seekb(0); /* Seek to first record */
+        m_file->clear();
+
+        bool used = true; // If record is used
+        unsigned i = -1;   // index counter
+        while(!m_file->eof()) {
+          // Check if record is marked used
+          m_file->read(reinterpret_cast<char*>(&used), sizeof(bool));
+          if(m_file->fail()) throw runtime_error("Failed to read record");
+          seekr(1);
+
+          if(!used)
+            m_unusedIndex.push(i); // Add index to unused list
+          i++;
+        }
+      } else {
+        cerr << "Local::checkUnused(): Database is not open" << endl;
       }
 
-      bool used = true; // If record is used
-      unsigned i = 0;   // index counter
-      while(!eof()) {
-        // Check if record is marked used
-        m_file->read(reinterpret_cast<char*>(used), sizeof(bool));
-        if(used) continue;
-        else m_unusedIndex.push(i); // Add index to unused list
-      }
-    } else {
-      cerr << "Local::checkUnused(): Database is not open" << endl;
+    } catch(exception& e) {
+      cerr << "Local::checkUnused(): " << e.what() << endl;
+      throw e;
     }
   }
 
@@ -187,26 +206,35 @@ namespace DB {
   }
 
   void Local::seekb(unsigned index) {
-    // Throw exception if index is out of range
-    if(index > m_dbSize) throw out_of_range("Exception: Bad index");
+    // TODO: Throw exception if index is out of range
+    if(index > m_dbSize) throw out_of_range("Out of Range: Bad index");
     // Move cursor to index * align
     m_cursor = m_header + (index * m_align);
   }
 
   void Local::seekr(unsigned index) {
-    // Move cursor to alignment of current record
-    // m_cursor = (m_cursor - (m_cursor % m_align));
+    // TODO: Throw exception if index is out of range
+    // Check if index will move cursor out of range
+    if(m_cursor < m_header) {
+      // Assume user wants first record
+      seekb(0);
+    } else if(m_cursor > (m_align*m_dbSize)) {
+      seekb(m_dbSize);
+      cerr << "Exception: Cursor was out of bounds somehow";
+    }
+
+    // Align cursor to beginning of current record
+    m_cursor = m_cursor - ((m_cursor - m_header) % m_align);
+
+    // Calculate where cursor will shifted to
+    int shifted = m_cursor + index * m_align;
+    // Check if cursor will go out of bounds
+    if(shifted <= (int) m_header || shifted > (int) m_dbSize * (int) m_align + (int) m_header) {
+      throw out_of_range("Out of Range: Bad index");
+    }
+
     // Move cursor relative by index * align
     m_cursor += (index * m_align);
-  }
-
-  bool Local::eof() {
-    if(m_file->eof()) {
-      m_file->clear();
-      return true;
-    } else {
-      return false;
-    }
   }
 
   bool Local::clean() {
