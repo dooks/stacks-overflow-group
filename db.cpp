@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdexcept>
 #include "db.h"
 #include "book.h"
 using namespace std;
@@ -10,50 +11,60 @@ namespace DB {
 
 
   Local::Local() :
-    m_cursor(0), m_dbSize(0) {
-      m_header = sizeof(unsigned);
-      m_align  = sizeof(Book) + sizeof(bool);
-      /* Initialize members*/
-    }
+    m_cursor(0), m_dbSize(0),
+    m_header(sizeof(unsigned)),
+    m_align(sizeof(Book) + sizeof(bool)) { /* Initialize members*/ }
 
   bool Local::open(string filename) {
-    // if m_open is false
-    if(m_file == NULL) {
-      // Open file if it doesn't exist
-      ifstream temp_file(filename);
-      temp_file.close();
-
-      // Open db file for reading at beginning
-      // Save pointer to istream to m_file
-      m_file = new fstream(filename, ios::in | ios::out | ios::binary);
-
-      if(!m_file->fail()) {
-        m_status |= DB::OPEN; // set status flag open
-
-        // If File is not empty
-        if(m_file->peek() != fstream::traits_type::eof()) {
-          // Read header
-          m_file->read(reinterpret_cast<char*>(&m_dbSize), sizeof(unsigned)); // Get size of database
-          checkUnused(); // Check for unused records
-          return true;
-        } else {
-          m_file->clear();
-
-          // File is empty
-          m_dbSize = 0; // Set size of db to zero
-          // Write header
-          m_file->write(reinterpret_cast<char*>(&m_dbSize), sizeof(unsigned));
-
-          queue<unsigned>().swap(m_unusedIndex); // Clear unused index queue
-          return true; // return true
-        }
-      } else {
-        // TODO: throw exception
-        // File failed to read
-        return false;
+    try {
+      {
+        // Open file if it doesn't exist - should always work
+        ofstream o(filename, ios::out | ios::app);
+        o.close();
       }
+
+    if(m_file != NULL) throw logic_error("Database already opened");
+
+    // Open db file
+    // Save pointer to fstream to m_file
+    m_file = new fstream;
+    m_file->open(filename, ios::in | ios::out | ios::binary | ios::ate);
+    if(m_file->fail()) throw logic_error(filename + " failed to open");
+
+    m_status |= DB::OPEN; // set status flag open
+
+    m_file->seekg(0, ios::beg);
+    m_file->seekp(0, ios::beg);
+
+    if(m_file->peek() != fstream::traits_type::eof()) {
+      // File is not empty
+      // Read header
+      // Get size of database from file
+      m_file->read(reinterpret_cast<char*>(&m_dbSize), sizeof(unsigned));
+      if(m_file->fail()) throw runtime_error("Failed to read " + filename);
+
+      checkUnused(); // Check for unused records
+      return true;
+
     } else {
-      // File already opened
+      // File is empty
+      m_file->clear();
+      m_dbSize = 0;
+      // Write header
+      m_file->write(reinterpret_cast<char*>(&m_dbSize), sizeof(unsigned));
+      if(m_file->fail()) throw runtime_error("Failed to write to " + filename);
+
+      queue<unsigned>().swap(m_unusedIndex); // Clear unused index queue
+      return true; // return true
+    }
+
+    } catch(exception& e) {
+      cerr << "Local::open() -- Exception: " << e.what() << endl;
+      if(m_file != NULL) {
+        m_file->close();
+        delete m_file;
+        m_file = NULL;
+      }
       return false;
     }
   }
@@ -141,13 +152,21 @@ namespace DB {
   // Internal methods
   void Local::checkUnused() {
     if(isOpen()) {
-    //    Seek to beginning
-    //    While not end of file
-    //       Read next bool into temp var
-    //       If true, continue
-    //       else push into m_unusedIndex
+      try { seekb(0); /* Seek to first record */ }
+      catch(const out_of_range& oor) {
+        cerr << "Local::checkUnused(): " << oor.what() << endl;
+      }
+
+      bool used = true; // If record is used
+      unsigned i = 0;   // index counter
+      while(!eof()) {
+        // Check if record is marked used
+        m_file->read(reinterpret_cast<char*>(used), sizeof(bool));
+        if(used) continue;
+        else m_unusedIndex.push(i); // Add index to unused list
+      }
     } else {
-    //    Throw exception and ignore
+      cerr << "Local::checkUnused(): Database is not open" << endl;
     }
   }
 
@@ -167,24 +186,18 @@ namespace DB {
     }
   }
 
-  bool Local::seekb(int index) {
+  void Local::seekb(unsigned index) {
+    // Throw exception if index is out of range
+    if(index > m_dbSize) throw out_of_range("Exception: Bad index");
     // Move cursor to index * align
     m_cursor = m_header + (index * m_align);
-    if(m_cursor <= m_dbSize)
-      return true;
-    else
-      return false;
   }
 
-  bool Local::seekr(int index) {
+  void Local::seekr(unsigned index) {
     // Move cursor to alignment of current record
-    //m_cursor = (m_cursor - (m_cursor % m_align));
+    // m_cursor = (m_cursor - (m_cursor % m_align));
     // Move cursor relative by index * align
     m_cursor += (index * m_align);
-    if(m_cursor <= m_dbSize)
-      return true;
-    else
-      return false;
   }
 
   bool Local::eof() {
@@ -197,6 +210,7 @@ namespace DB {
   }
 
   bool Local::clean() {
+    // TODO
     // Reindex database... low priority
     return true;
   }
