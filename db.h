@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <fstream>
-#include <vector>
+#include <queue>
 using std::string;
 
 #include "book.h"
@@ -24,42 +24,41 @@ namespace DB {
       virtual bool open(std::string) = 0; // Open database for reading/writing
       virtual bool isOpen()      = 0; // Check if db is open
       virtual  int add(Book*)    = 0; // Add book to database
-      virtual  int read(Book*)   = 0; // Read record at cursor into Book*
-      virtual  int remove(Book*) = 0; // Remove this record
+      virtual bool read(Book*)   = 0; // Read record at cursor into Book*
+      virtual bool remove(Book*) = 0; // Remove this record
       virtual bool close()       = 0;
       virtual ~Database() {}
   };
 
   class Local : public Database {
-    int m_cursor;
-    int m_align;
+    unsigned m_cursor;
+    size_t    m_align;
+    size_t   m_header;
+    unsigned m_dbSize;
 
-    std::string m_filename;
-    std::ifstream*  m_file;
-    std::vector<int> m_unusedIndex;
+    std::fstream*  m_file;
+    std::queue<unsigned> m_unusedIndex;
 
     // Internal Methods
     int write(Book*, bool); // Write book into record used/unused
-    void checkUnused(); // Read entire db file for unused records
-    void seekb(int);  // Set cursor to record from beginning
-    void seekr(int);  // Set cursor to record relative
-    void seeke(void); // Set cursor to last record
+    void checkUnused();     // Read entire db file for unused records
+    void seekb(unsigned);   // Set cursor to record from beginning
+    void seekr(int);        // Set cursor to record relative
     bool clean();
 
-    // Status methods
-    bool eof();
-    bool fail();
-    bool clear();
-
   public:
-    Local(std::string);
+    Local();
 
     // Public methods
     bool open(std::string);
-    int    add(Book*);
-    int   read(Book*);
-    int remove(Book*); // Mark record as unused
-    bool      close();
+    bool isOpen();
+    int  add(Book*);
+    bool read(Book*);
+    bool remove(Book*); // Mark record as unused
+    bool close();
+
+    void start(); // Move cursor to first record
+    bool   eof(); // Check if last record reached
   };
 
   class Remote : public Database {
