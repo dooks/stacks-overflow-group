@@ -2,18 +2,15 @@
 #include <vector>
 #include "db.h"
 #include "book.h"
+using std::vector;
 
 class Inventory {
-public:
-  typedef std::vector<Book*> book_list;
-  typedef std::vector<Book*>::iterator book_iter;
-
 private:
   typedef std::vector<size_t> size_list;
   typedef std::vector<size_t> size_iter;
 
-  book_list   m_bookList;
-  book_list    m_addList; // List of new books to add at sync
+  vector<Book*> m_bookList;
+  vector<Book*>  m_addList; // List of new books to add at sync
   size_list  m_deltaList; // List of books that have changed
   size_list m_deleteList; // List of books to delete at sync
   DB::Database*     m_db;
@@ -21,18 +18,23 @@ private:
   int clearBookList();    // Deletes list items, and clears
 
 public:
+  Inventory();
+  Inventory(DB::Database*);
+  ~Inventory();
+
   // Mutators
-  int addBook(Book*);     // Append book to book list at sync
-  int updBook(book_iter); // Flag book for changes at sync
-  int delBook(book_iter); // Flag book for deletion at sync
+  void setDatabase(DB::Database*);
+  int  addBook(Book*); // Append book to book list at sync
+  int  updBook(Book*); // Flag book for changes at sync
+  int  delBook(Book*); // Flag book for deletion at sync
 
   int sync();             // Save all buffered changes
-  // Critical note: this will invalidate any iterators to book_list
+  // Critical note: this will invalidate any iterators to vector<Book*>
   int reset();            // Reset book list to database
-  // Critical note: this will invalidate any iterators to book_list
+  // Critical note: this will invalidate any iterators to vector<Book*>
 
   // Accessors
   int getSize();          // Return number of books in inventory
-  book_list getRange(int, int);
-  book_list findBook(Book::field, void*);
+  vector<Book*> getRange(int, int);
+  vector<Book*> findBook(Book::field, void*);
 };

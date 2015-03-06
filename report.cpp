@@ -100,7 +100,7 @@ vector<Book*> Report::getSortAge(bool asc) {
 
 
 // Private methods
-void Report::sort(Inventory::book_list& list, Book::field field) {
+void Report::sort(vector<Book*>& list, Book::field field) {
   // switch field:
   //    Sort....
 }
