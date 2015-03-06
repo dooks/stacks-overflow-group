@@ -2,7 +2,7 @@
 #include "db.h"
 #include "book.h"
 
-#define INV_FILE "inventory.db"
+#define INV_FILE "tools/books.db"
 
 Inventory::Inventory() {
   //m_db = new DB::Local(INV_FILE);

@@ -174,6 +174,12 @@ namespace DB {
     }
   }
 
+  void Local::start() { seekb(0); }
+  bool Local::eof() {
+    // Check if next record up does not exist?
+    return false;
+  }
+
 
 
 

@@ -56,7 +56,9 @@ namespace DB {
     bool read(Book*);
     bool remove(Book*); // Mark record as unused
     bool close();
-    bool eof();
+
+    void start(); // Move cursor to first record
+    bool   eof(); // Check if last record reached
   };
 
   class Remote : public Database {

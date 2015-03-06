@@ -10,13 +10,15 @@ class Book {
   string m_isbn;
   string m_title;
   string m_author;
+  string m_publisher;
   date   m_dateAdded;
   int    m_quantity;
   double m_wholeCost;
   double m_retailPrice;
 
 public:
-  enum field { ISBN, TITLE, AUTHOR, QUANTITY, WHOLECOST, DATEADDED };
+  enum field { ISBN, TITLE, AUTHOR, PUBLISHER,
+    QUANTITY, WHOLECOST, RETAILPRICE, DATEADDED };
 
   // Constructors
   Book();
@@ -27,8 +29,11 @@ public:
   void setISBN(string);
   void setTitle(string);
   void setAuthor(string);
+  void setPublisher(string);
   void setDateAdded(int, int, int);
   void setQuantity(int);
+  void setWholeCost(double);
+  void setRetailPrice(double);
   void setRandom();
 
   // Accessors
@@ -36,7 +41,8 @@ public:
   string getISBN(void);
   string getTitle(void);
   string getAuthor(void);
-  date   getDate(void);
+  string getPublisher(void);
+  date   getDateAdded(void);
   int    getQuantity(void);
   double getWholeCost(void);
   double getRetailPrice(void);
