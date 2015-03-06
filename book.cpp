@@ -9,10 +9,11 @@ Book::~Book() {}
 void Book::setISBN  (string isbn)    { m_isbn = isbn; }
 void Book::setTitle (string title)   { m_title = title; }
 void Book::setAuthor(string author)  { m_author = author; }
+void Book::setQuantity(int quantity)  { m_quantity = quantity; }
 void Book::setDateAdded(int month, int day, int year) {
-  //m_dateAdded.setMonth = month;
-  //m_dateAdded.setDay   =   day;
-  //m_dateAdded.setYear  =  year;
+  m_dateAdded.setMonth(month);
+      m_dateAdded.setDay(day);
+    m_dateAdded.setYear(year);
 }
 void Book::setRandom()  {
   // Set random isbn string

@@ -27,6 +27,7 @@ public:
   void setTitle(string);
   void setAuthor(string);
   void setDateAdded(int, int, int);
+  void setQuantity(int);
   void setRandom();
 
   // Accessors
