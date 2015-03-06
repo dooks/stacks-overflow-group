@@ -8,7 +8,7 @@ using std::vector;
 class Report {
 private:
   Inventory* inventory;
-  void sort(Inventory::book_list&, Book::field); // Sort list by field
+  void sort(vector<Book*>&, Book::field); // Sort list by field
 
 public:
   Report(Inventory*);

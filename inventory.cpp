@@ -1,5 +1,20 @@
 #include "inventory.h"
+#include "db.h"
 #include "book.h"
+
+#define INV_FILE "inventory.db"
+
+Inventory::Inventory() {
+  //m_db = new DB::Local(INV_FILE);
+}
+
+Inventory::Inventory(DB::Database* db) {
+  m_db = db;
+}
+
+Inventory::~Inventory() {
+  delete m_db;
+}
 
 // Mutators
 int Inventory::addBook(Book* book) {
@@ -7,7 +22,7 @@ int Inventory::addBook(Book* book) {
   return 0;
 }
 
-int Inventory::updBook(Inventory::book_iter iter) {
+int Inventory::updBook(Book* book) {
   // Get index from iterator
   // if index exists in delta list
   //    erase element from delta list
@@ -16,7 +31,7 @@ int Inventory::updBook(Inventory::book_iter iter) {
   return 0;
 }
 
-int Inventory::delBook(Inventory::book_iter iter) {
+int Inventory::delBook(Book* book) {
   // Get index from iterator
   // if index exists in delta list
   //    return error
@@ -65,9 +80,9 @@ int Inventory::getSize()               {
   return 0;
 }
 
-Inventory::book_list Inventory::getRange(int first, int last) {
+vector<Book*> Inventory::getRange(int first, int last) {
   // Create empty book list
-  Inventory::book_list retval;
+  vector<Book*> retval;
 
   // if first < last
   //    if first/last are within book list bounds
@@ -76,9 +91,9 @@ Inventory::book_list Inventory::getRange(int first, int last) {
   return retval;
 }
 
-Inventory::book_list Inventory::findBook(Book::field field, void* search) {
+vector<Book*> Inventory::findBook(Book::field field, void* search) {
   // Create temp book list
-  Inventory::book_list retval;
+  vector<Book*> retval;
 
   // for all books in book list
   //    switch field
