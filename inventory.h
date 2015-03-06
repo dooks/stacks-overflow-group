@@ -9,11 +9,11 @@ private:
   typedef std::vector<size_t> size_list;
   typedef std::vector<size_t> size_iter;
 
-  vector<Book*> m_bookList;
+  vector<Book*>  m_bookList;
   vector<Book*>  m_addList; // List of new books to add at sync
-  size_list  m_deltaList; // List of books that have changed
-  size_list m_deleteList; // List of books to delete at sync
-  DB::Database*     m_db;
+  vector<size_t> m_deltaList; // List of books that have changed
+  vector<size_t> m_deleteList; // List of books to delete at sync
+  DB::Database*  m_db;
 
   int clearBookList();    // Deletes list items, and clears
 
