@@ -206,7 +206,7 @@ namespace DB {
   bool Local::eof() {
     // Be generous with eof conditions...
     // EOF counts as anything greater than (m_header + (m_align * m_dbSize))
-    if(m_cursor > m_header + (m_align * m_dbSize)) return true;
+    if(m_cursor >= m_header + (m_align * m_dbSize)) return true;
     else return false;
   }
 
