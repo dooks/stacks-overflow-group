@@ -7,10 +7,10 @@ using std::string;
 class Book {
   unsigned m_index;
 
-  string m_isbn;
-  string m_title;
-  string m_author;
-  string m_publisher;
+  char m_isbn[11];
+  char m_title[100];
+  char m_author[25];
+  char m_publisher[25];
   date   m_dateAdded;
   int    m_quantity;
   double m_wholeCost;
@@ -21,8 +21,10 @@ public:
     QUANTITY, WHOLECOST, RETAILPRICE, DATEADDED };
 
   // Constructors
-  Book();
+  Book();                     // Default
+  Book(const Book&);          // Copy
   ~Book();
+  void operator=(const Book&); // Assignment
 
   // Mutators
   void setFileIndex(unsigned);

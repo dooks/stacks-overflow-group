@@ -26,8 +26,8 @@ namespace DB {
     if(m_file != NULL) throw logic_error("Database already opened");
 
     // Open db file
-    // Save pointer to fstream to m_file
     m_file = new fstream;
+    // Make sure file will throw exceptions if necessary
     m_file->exceptions( fstream::failbit | fstream::badbit );
     m_file->open(filename, ios::in | ios::out | ios::binary | ios::ate);
 
@@ -42,7 +42,7 @@ namespace DB {
       // Get size of database from file
       m_file->read(reinterpret_cast<char*>(&m_dbSize), sizeof(unsigned));
 
-      checkUnused(); // Check for unused records
+      m_unusedIndex = findUnused(); // Check for unused records
       return true;
 
     } else {
@@ -112,20 +112,50 @@ namespace DB {
   }
 
   bool Local::read(Book* book) {
-    // Reset fail bits
-    m_file->clear();
+    try {
+      // Reset fail bits
+      m_file->clear();
+      seekr(0); // Seek to alignment of current record (redundant check)
 
-    // Check if used record
-    bool used = true;
-    m_file->read(reinterpret_cast<char*>(used), sizeof(bool));
-    if(m_file->fail()) throw runtime_error("Could not read file.");
-    if(!used) return false; // Skip record
+      // Check if used record
+      bool used = true;
+      m_file->read(reinterpret_cast<char*>(&used), sizeof(bool));
 
-    // TODO: deep copy...
-    m_file->read(reinterpret_cast<char*>(book), sizeof(book)); // Save record at cursor into book
-    if(m_file->fail()) throw runtime_error("Could not read file.");
-    // TODO: exception... file corrupt
-    return true;
+      if(!used) {
+        seekr(1);
+        return false; // Skip record
+      }
+
+      Book* temp = new Book;
+      m_file->read(reinterpret_cast<char*>(temp), sizeof(Book)); // Save record at cursor into book
+      *book = *temp; // Deep copy....? Hopefully
+      delete temp;
+
+      seekr(1); // Move to next record
+      return true;
+    } catch (exception& e) {
+      cerr << "Local::read(): " << e.what() << endl;
+      return false;
+    }
+  }
+
+  bool Local::change(Book* book) {
+    try {
+      if(book   == NULL)
+        throw domain_error("Domain Error: Argument is NULL");
+      if(m_file == NULL)
+        throw logic_error("Database not open");
+
+      // Seek to record at index
+      seekb(book->getFileIndex());
+      // Overwrite book at record
+      write(book, true);
+      return true;
+
+    } catch(exception& e) {
+      cerr << "Local::change(): " << e.what() << endl;
+      return false;
+    }
   }
 
   bool Local::remove(Book* book) {
@@ -135,8 +165,6 @@ namespace DB {
     try {
       if(book   == NULL)
         throw domain_error("Domain Error: Argument is NULL");
-      if(book->getFileIndex() == -1)
-        throw domain_error("Domain Error: Book's index is not valid.");
       if(m_file == NULL)
         throw logic_error("Database not open");
 
@@ -176,8 +204,10 @@ namespace DB {
 
   void Local::start() { seekb(0); }
   bool Local::eof() {
-    // Check if next record up does not exist?
-    return false;
+    // Be generous with eof conditions...
+    // EOF counts as anything greater than (m_header + (m_align * m_dbSize))
+    if(m_cursor > m_header + (m_align * m_dbSize)) return true;
+    else return false;
   }
 
 
@@ -185,7 +215,9 @@ namespace DB {
 
 
   // Internal methods
-  void Local::checkUnused() {
+  queue<unsigned> Local::findUnused() {
+    queue<unsigned> retval;
+
     try {
       if(isOpen()) {
         seekb(0); /* Seek to first record */
@@ -200,7 +232,7 @@ namespace DB {
           seekr(1);
 
           if(!used)
-            m_unusedIndex.push(i); // Add index to unused list
+            retval.push(i); // Add index to unused list
           i++;
         }
       } else {
@@ -211,23 +243,27 @@ namespace DB {
       cerr << "Local::checkUnused(): " << e.what() << endl;
       throw e;
     }
+
+    return retval;
   }
 
-  int Local::write(Book* book, bool used) {
+  void Local::write(Book* book, bool used) {
     // Reset fail bits...
     m_file->clear();
 
-    if(isOpen()) {
-      // If file is open:
+    try {
+      if(book   == NULL)
+        throw domain_error("Domain Error: Argument is NULL");
+      if(m_file == NULL)
+        throw logic_error("Database not open");
+
       bool temp = true; // Write bool used
       m_file->write(reinterpret_cast<char*>(&temp), sizeof(bool));
       // Write book structure
       m_file->write(reinterpret_cast<char*>(book), sizeof(Book));
-      return book->getFileIndex();
-    } else {
-      // File not open
-      // Throw exception
-      return -1;
+    } catch(exception& e) {
+      cerr << " | Local::write(): " << e.what() << endl;
+      throw e;
     }
   }
 
