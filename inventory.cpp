@@ -7,13 +7,35 @@
 #include "book.h"
 using namespace std;
 
-#define INV_FILE "tools/books.db"
+#define DEFAULT_INV_FILE "tools/books.db"
 
 Inventory::Inventory()                 { m_db = NULL; }
 Inventory::Inventory(DB::Database* db) { m_db = db;   }
 
 Inventory::~Inventory() {
   if(m_db != NULL) delete m_db;
+}
+
+void Inventory::setDatabase(DB::Database* db) {
+  try {
+    if(db == NULL) throw domain_error("Argument is NULL");
+    m_db = db;
+    return;
+  } catch(exception& e) {
+    cerr << "Inventory::setDatabase: " << e.what() << endl;
+    return;
+  }
+}
+
+void Inventory::setDatabaseFile(string filename = DEFAULT_INV_FILE) {
+  try {
+    if(filename == "") throw domain_error("Argument is empty");
+    m_dbFileName = filename;
+    return;
+  } catch(exception& e) {
+    cerr << "Inventory::setDatabaseFile: " << e.what() << endl;
+    return;
+  }
 }
 
 // Mutators
@@ -66,22 +88,45 @@ bool Inventory::delBook(Book* book) {
 }
 
 bool Inventory::sync() {
-  // Open database
-  // for elements in delta list
-  //    Set cursor to record based on index
-  //    Write book to record
-  // for elements in delete list
-  //    Set cursor to record based on index
-  //    Remove record from database
-  //    Erase book from book list
-  // for elements in add list
-  //    TODO: check if element exists in book list
-  //    Push element to book list
-  //    Write book to database
-  // close database
-  //
-  // call reset
-  return 0;
+  try {
+    // Open database
+    m_db->open(DEFAULT_INV_FILE);
+
+    // for elements in delta list
+    for(unsigned i = 0; i < m_deltaList.size(); i++) {
+      // Find book by index
+      Book* temp = getBook(m_deltaList[i]);
+      // Write book to record
+      //if(!m_db->change(temp)) throw runtime_error("Could not modify database");
+    }
+
+
+    // Sort delete list in reverse... order matters when deleting from arrays!
+    sort(m_deleteList.begin(), m_deleteList.end());
+    reverse(m_deleteList.begin(), m_deleteList.end()); // TODO: Inefficient...?
+    //for(unsigned i = m_deleteList.size(); i >= 0; i--) {
+      //Book* temp = getBook(m_deleteList[i]);
+      ////if(!m_db->remove(temp)) throw runtime_error("Could not remove from database");
+      //delete temp;        // Deallocate
+      //m_deleteList.erase(m_deleteList.begin() + i); // Erase from vector
+    //}
+
+
+    // for elements in add list
+    for(unsigned i = 0; i < m_addList.size(); i++) {
+      // Push element to book list
+      m_bookList.push_back(m_addList[i]);
+      // Write book to database
+      //if(!m_db->add(m_addList[i])) throw runtime_error("Could not add to database");
+    }
+
+    m_db->close();
+    reset();
+    return true;
+  } catch(exception& e) {
+    cerr << "Inventory::sync: " << e.what() << endl;
+    return false;
+  }
 }
 
 bool Inventory::reset() {
@@ -91,7 +136,7 @@ bool Inventory::reset() {
     clearBookList(); // Clear book list
 
     // Open database
-    m_db->open(INV_FILE);
+    m_db->open(DEFAULT_INV_FILE);
     m_db->start(); // Start reading from beginning
 
     while(!m_db->eof()) {
@@ -123,10 +168,21 @@ vector<Book*> Inventory::getRange(int first, int last) {
   // Create empty book list
   vector<Book*> retval;
 
-  // if first < last
-  //    if first/last are within book list bounds
-  //      Assign empty vector with bounds from book list
-  // return book list (empty or not)
+  try {
+    if(first >= last) throw domain_error("Domain Error: first >= last");
+
+    // check if first/last are within book list bounds
+    // Auto throws out of range exception
+    m_bookList.at(first);
+    m_bookList.at(last);
+
+    // Assign empty vector with bounds from book list
+    vector<Book*> sub(m_bookList.begin() + first, m_bookList.begin() + last);
+    retval = sub;
+
+  } catch(exception &e) {
+    cerr << "Inventory::getRange: "  << e.what() << endl;
+  }
   return retval;
 }
 
@@ -135,25 +191,41 @@ vector<Book*> Inventory::findBook(Book::field field, void* search) {
   vector<Book*> retval;
 
   // for all books in book list
-  //    switch field
-  //      case ISBN
-  //        if book isbn is equal to search
-  //          push book to temp book list
-  //      case TITLE
-  //        if book title is equal to search
-  //          push book to temp book list
-  //      case AUTHOR
-  //        if book author is equal to search
-  //          push book to temp book list
-  //      case QUANTITY
-  //        if book quantity is equal to search
-  //          push book to temp book list
-  //      case WHOLECOST
-  //        if book wholecost is equal to search
-  //          push book to temp book list
-  //      case DATEADDED
-  //        if book dateadded is equal to search
-  //          push book to temp book list
+  for(unsigned i = 0; i < m_bookList.size(); i++) {
+    Book* book = m_bookList[i];
+    switch(field) {
+      case Book::ISBN:
+        if(book->getISBN() == *((string*) search))
+          retval.push_back(book);
+        break;
+      case Book::TITLE:
+        if(book->getTitle() == *((string*) search))
+          retval.push_back(book);
+        break;
+      case Book::AUTHOR:
+        if(book->getAuthor() == *((string*) search))
+          retval.push_back(book);
+        break;
+      case Book::QUANTITY:
+        if(book->getQuantity() == *((int*) search))
+          retval.push_back(book);
+        break;
+      case Book::WHOLECOST:
+        if(book->getWholeCost() == *((double*) search))
+          retval.push_back(book);
+        break;
+      case Book::RETAILPRICE:
+        if(book->getRetailPrice() == *((double*) search))
+          retval.push_back(book);
+        break;
+      case Book::DATEADDED:
+        if(book->getDateAdded() == *((date*) search))
+          retval.push_back(book);
+        break;
+      default:
+        break;
+    }
+  }
   return retval;
 }
 
@@ -161,12 +233,25 @@ vector<Book*> Inventory::findBook(Book::field field, void* search) {
 
 
 
-
-
-
-
-
 // Private methods
+Book* Inventory::getBook(unsigned index) {
+  try {
+    if(index >= m_bookList.size()) throw out_of_range("Out of Range");
+
+    // For all items in book list
+    // TODO: critical: book file indices must start at 0, not 1
+    for(unsigned i = 0; i < m_bookList.size(); i++) {
+      if(m_bookList[i]->getFileIndex() == index)
+        return m_bookList[i];
+    }
+
+    return NULL;
+  } catch(exception& e) {
+    cerr << "Inventory::getBook: " << e.what() << endl;
+    return NULL;
+  }
+}
+
 void Inventory::clearBookList() {
   for(unsigned i = 0; i < m_bookList.size(); i++) {
     delete m_bookList[i];
