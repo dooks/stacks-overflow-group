@@ -4,6 +4,7 @@
 #include "book.h"
 using std::vector;
 
+Report::Report() {}
 Report::Report(Inventory* inv) { /* Initialize members */ }
 
 // Mutators

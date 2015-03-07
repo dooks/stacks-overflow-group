@@ -11,6 +11,7 @@ private:
   void sort(vector<Book*>&, Book::field); // Sort list by field
 
 public:
+  Report();
   Report(Inventory*);
 
   // Mutators
