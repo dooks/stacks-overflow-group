@@ -43,9 +43,18 @@ bool Inventory::addBook(Book* book) {
   try {
     if(book == NULL) throw domain_error("Domain Error: Argument is NULL");
 
-    // TODO: Issue #26: Should change quantity if book exists
-    // Add book to list, for writing to file later
-    m_addList.push_back(book);
+    // ISBN numbers are unique: search if exists
+    // Only add to FIRST book found
+    vector<Book*> search = findBook(Book::ISBN, &(book->getISBN()));
+    if(search.empty()) {
+      // Add book to list, for writing to file later
+      m_addList.push_back(book);
+    } else {
+      // Change quantity of found book
+      search[0]->setQuantity( search[0]->getQuantity() + 1);
+      // Mark book for update
+      updBook(search[0]);
+    }
   } catch(exception& e) {
     cerr << "Inventory::addBook: " << e.what() << endl;
   }
