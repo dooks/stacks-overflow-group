@@ -6,6 +6,8 @@
 using std::string;
 using std::vector;
 
+#define DEFAULT_INV_FILE "tools/books.db"
+
 class Inventory {
   vector<Book*>  m_bookList;
   vector<Book*>  m_addList; // List of new books to add at sync
@@ -18,16 +20,15 @@ class Inventory {
   void clearBookList();    // Deletes list items, and clears
 
 public:
-  Inventory();
-  Inventory(DB::Database*);
+  Inventory();          // Use default db file, DEFAULT_INV_FILE
+  Inventory(string);    // Initialize with a filename
   ~Inventory();
 
   // Mutators
-  void setDatabase(DB::Database*);
-  void setDatabaseFile(string);
-  bool addBook(Book*); // Append book to book list at sync
-  bool updBook(Book*); // Flag book for changes at sync
-  bool delBook(Book*); // Flag book for deletion at sync
+  bool setFile(string); // Set location of db file
+  bool addBook(Book*);  // Append book to book list at sync
+  bool updBook(Book*);  // Flag book for changes at sync
+  bool delBook(Book*);  // Flag book for deletion at sync
 
   bool sync();             // Save all buffered changes
   // Critical note: this will invalidate any iterators to vector<Book*>

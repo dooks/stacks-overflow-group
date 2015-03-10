@@ -93,8 +93,8 @@ namespace DB {
 
       } else {
         // No unused indices... append to file instead
-        // Increase size of db by one
-        index = m_dbSize += 1;
+        // Increase size of database
+        index = m_dbSize++; // index will be m_dbSize - 1
         m_file->seekp(0, ios::beg); // Set cursor to beginning of file
         m_file->write(reinterpret_cast<char*>(&m_dbSize), sizeof(unsigned));
 

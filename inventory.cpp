@@ -7,43 +7,23 @@
 #include "book.h"
 using namespace std;
 
-#define DEFAULT_INV_FILE "tools/books.db"
-
-Inventory::Inventory()                 { m_db = NULL; }
-Inventory::Inventory(DB::Database* db) { m_db = db;   }
-
-Inventory::~Inventory() {
-  if(m_db != NULL) delete m_db;
+Inventory::Inventory()  {
+  m_db = new DB::Local;
+  m_dbFileName = DEFAULT_INV_FILE;
+}
+Inventory::Inventory(string filename) {
+  m_db = new DB::Local;
+  m_dbFileName = filename;
 }
 
-void Inventory::setDatabase(DB::Database* db) {
-  try {
-    if(db == NULL) throw domain_error("Argument is NULL");
-    m_db = db;
-    return;
-  } catch(exception& e) {
-    cerr << "Inventory::setDatabase: " << e.what() << endl;
-    return;
-  }
-}
-
-void Inventory::setDatabaseFile(string filename = DEFAULT_INV_FILE) {
-  try {
-    if(filename == "") throw domain_error("Argument is empty");
-    m_dbFileName = filename;
-    return;
-  } catch(exception& e) {
-    cerr << "Inventory::setDatabaseFile: " << e.what() << endl;
-    return;
-  }
-}
+Inventory::~Inventory() { if(m_db != NULL) delete m_db; }
 
 // Mutators
 bool Inventory::addBook(Book* book) {
   try {
     if(book == NULL) throw domain_error("Domain Error: Argument is NULL");
 
-    // ISBN numbers are unique: search if exists
+    // ISBN numbers are unique (or should be...): search if exists
     // Only add to FIRST book found
     vector<Book*> search = findBook(Book::ISBN, &(book->getISBN()));
     if(search.empty()) {
@@ -99,7 +79,7 @@ bool Inventory::delBook(Book* book) {
 bool Inventory::sync() {
   try {
     // Open database
-    m_db->open(DEFAULT_INV_FILE);
+    m_db->open(m_dbFileName);
 
     // for elements in delta list
     for(unsigned i = 0; i < m_deltaList.size(); i++) {
@@ -140,12 +120,14 @@ bool Inventory::sync() {
 
 bool Inventory::reset() {
   try {
+    if(m_db == NULL) throw domain_error("Database not initialized (use Inventory::setDatabase");
+
     // Clear delta list, add list, and delete list
     m_deltaList.clear(); m_addList.clear(); m_deleteList.clear();
     clearBookList(); // Clear book list
 
     // Open database
-    m_db->open(DEFAULT_INV_FILE);
+    m_db->open(m_dbFileName);
     m_db->start(); // Start reading from beginning
 
     while(!m_db->eof()) {
