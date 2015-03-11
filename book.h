@@ -1,6 +1,8 @@
 #pragma once
+#include <iostream>
 #include <string>
 using std::string;
+using std::size_t;
 
 #include "date.h"
 
@@ -21,10 +23,12 @@ public:
     QUANTITY, WHOLECOST, RETAILPRICE, DATEADDED };
 
   // Constructors
-  Book();                     // Default
-  Book(const Book&);          // Copy
+  Book();                       // Default
+  Book(const Book&);            // Copy
   ~Book();
-  void operator=(const Book&); // Assignment
+  void  operator=(const Book&); // Assignment
+  void* operator   new(size_t);
+  void  operator delete(void*);
 
   // Mutators
   void setFileIndex(unsigned);

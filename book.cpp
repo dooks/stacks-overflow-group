@@ -1,5 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
-
 #include <string>
 #include "date.h"
 using std::string;
@@ -44,6 +42,15 @@ void Book::operator=(const Book& o) {
   m_retailPrice = o.m_retailPrice;
 }
 Book::~Book() {}
+
+void* Book::operator new(size_t size) {
+  //return new Book();
+  return NULL;
+}
+
+void Book::operator delete(void* ptr) {
+  //delete ptr;
+}
 
 void Book::setFileIndex(unsigned idx) { m_index = idx;        }
 void Book::setISBN(string isbn)    {
