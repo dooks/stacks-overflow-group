@@ -93,17 +93,11 @@ bool Inventory::sync() {
       //if(!m_db->change(temp)) throw runtime_error("Could not modify database");
     }
 
-
-    // Sort delete list in reverse... order matters when deleting from arrays!
-    sort(m_deleteList.begin(), m_deleteList.end());
-    reverse(m_deleteList.begin(), m_deleteList.end()); // TODO: Inefficient...?
-    //for(unsigned i = m_deleteList.size(); i >= 0; i--) {
-      //Book* temp = getBook(m_deleteList[i]);
-      ////if(!m_db->remove(temp)) throw runtime_error("Could not remove from database");
-      //delete temp;        // Deallocate
-      //m_deleteList.erase(m_deleteList.begin() + i); // Erase from vector
-    //}
-
+    // for elements in delete list
+    for(unsigned i = 0; i < m_deleteList.size(); i++) {
+      Book* temp = getBook(m_deleteList[i]);
+      //if(!m_db->remove(temp)) throw runtime_error("Could not remove from database");
+    }
 
     // for elements in add list
     for(unsigned i = 0; i < m_addList.size(); i++) {
@@ -112,8 +106,8 @@ bool Inventory::sync() {
       // Write book to database
       //if(!m_db->add(m_addList[i])) throw runtime_error("Could not add to database");
     }
-
     m_db->close();
+
     reset();
     return true;
   } catch(exception& e) {
@@ -267,4 +261,6 @@ void Inventory::clearBookList() {
   for(unsigned i = 0; i < m_bookList.size(); i++) {
     delete m_bookList[i];
   }
+
+  m_bookList.clear();
 }
