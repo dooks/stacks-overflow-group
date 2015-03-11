@@ -153,20 +153,23 @@ unsigned Inventory::getSize()               {
   return m_bookList.size();
 }
 
-vector<Book*> Inventory::getRange(int first, int last) {
+vector<Book*> Inventory::getRange(int f, int l) { // (first, last)
   // Create empty book list
   vector<Book*> retval;
+  int first = f;
+  int last  = l;
 
   try {
     if(first >= last) throw domain_error("Domain Error: first >= last");
 
     // check if first/last are within book list bounds
-    // Auto throws out of range exception
-    m_bookList.at(first);
-    m_bookList.at(last);
+    try { m_bookList.at(first); }
+    catch(...) { first = 0; }
+    try { m_bookList.at(last); }
+    catch(...) { last = m_bookList.size() - 1; }
 
     // Assign empty vector with bounds from book list
-    vector<Book*> sub(m_bookList.begin() + first, m_bookList.begin() + last);
+    vector<Book*> sub(m_bookList.begin() + first, m_bookList.begin() + last + 1);
     retval = sub;
 
   } catch(exception &e) {
