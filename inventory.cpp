@@ -1,7 +1,11 @@
+// STL Library
 #include <iostream>
 #include <stdexcept>
+#include <regex>
 #include <algorithm>
 #include <vector>
+
+// Project file
 #include "inventory.h"
 #include "db.h"
 #include "book.h"
@@ -181,46 +185,62 @@ vector<Book*> Inventory::findBook(Book::field field, void* search) {
   // Create temp book list
   vector<Book*> retval;
 
-  // for all books in book list
-  for(unsigned i = 0; i < m_bookList.size(); i++) {
-    Book* book = m_bookList[i];
+  try {
+    // Regular expression based on search term and case insensitive
+    regex exp;
+    smatch match;
     switch(field) {
+      // Only assign exp to fields that will actually be strings
       case Book::ISBN:
-        if(book->getISBN() == *((string*) search))
-          retval.push_back(book);
-        break;
       case Book::TITLE:
-        if(book->getTitle() == *((string*) search))
-          retval.push_back(book);
-        break;
       case Book::AUTHOR:
-        if(book->getAuthor() == *((string*) search))
-          retval.push_back(book);
-        break;
-      case Book::QUANTITY:
-        if(book->getQuantity() == *((int*) search))
-          retval.push_back(book);
-        break;
-      case Book::WHOLECOST:
-        if(book->getWholeCost() == *((double*) search))
-          retval.push_back(book);
-        break;
-      case Book::RETAILPRICE:
-        if(book->getRetailPrice() == *((double*) search))
-          retval.push_back(book);
-        break;
-      case Book::DATEADDED:
-        if(book->getDateAdded() == *((date*) search))
-          retval.push_back(book);
-        break;
-      default:
+        exp.assign( *( (string*) search ), regex_constants::icase );
         break;
     }
+
+    // for all books in book list
+    for(unsigned i = 0; i < m_bookList.size(); i++) {
+      Book* book = m_bookList[i];
+
+      switch(field) {
+        case Book::ISBN:
+          if(regex_search(book->getISBN(), match, exp))
+            retval.push_back(book);
+          break;
+        case Book::TITLE:
+          if(regex_search(book->getTitle(), match, exp))
+            retval.push_back(book);
+          break;
+        case Book::AUTHOR:
+          if(regex_search(book->getAuthor(), match, exp))
+            retval.push_back(book);
+          break;
+        case Book::QUANTITY:
+          if(book->getQuantity() == *((int*) search))
+            retval.push_back(book);
+          break;
+        case Book::WHOLECOST:
+          if(book->getWholeCost() == *((double*) search))
+            retval.push_back(book);
+          break;
+        case Book::RETAILPRICE:
+          if(book->getRetailPrice() == *((double*) search))
+            retval.push_back(book);
+          break;
+        case Book::DATEADDED:
+          if(book->getDateAdded() == *((date*) search))
+            retval.push_back(book);
+          break;
+        default:
+          break;
+      }
+    }
+  } catch(exception& e) {
+    cerr << "Inventory::findBook: " << e.what() << endl;
   }
+
   return retval;
 }
-
-
 
 
 
