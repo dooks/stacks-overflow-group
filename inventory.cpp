@@ -54,6 +54,8 @@ bool Inventory::updBook(Book* book) {
     if(find(first, last, book->getFileIndex()) == last) {
       // Push index to delta list
       m_deltaList.push_back(book->getFileIndex());
+    } else {
+      throw domain_error("Book not currently in database");
     }
   } catch(exception& e) {
     cerr << "Inventory::updBook(): "  << e.what() << endl;
@@ -85,18 +87,26 @@ bool Inventory::sync() {
     // Open database
     m_db->open(m_dbFileName);
 
+    // for elements in delete list
+    for(unsigned i = 0; i < m_deleteList.size(); i++) {
+      Book* temp = getBook(m_deleteList[i]);
+      int m = 0;
+      // Decrement quantity...
+      temp->setQuantity( temp->getQuantity() - 1 );
+      if(temp->getQuantity() <= 0) {
+        // Remove from database entirely
+        //if(!m_db->remove(temp)) throw runtime_error("Could not remove from database");
+      } else {
+        updBook(temp); // Add to delta list
+      }
+    }
+
     // for elements in delta list
     for(unsigned i = 0; i < m_deltaList.size(); i++) {
       // Find book by index
       Book* temp = getBook(m_deltaList[i]);
       // Write book to record
       //if(!m_db->change(temp)) throw runtime_error("Could not modify database");
-    }
-
-    // for elements in delete list
-    for(unsigned i = 0; i < m_deleteList.size(); i++) {
-      Book* temp = getBook(m_deleteList[i]);
-      //if(!m_db->remove(temp)) throw runtime_error("Could not remove from database");
     }
 
     // for elements in add list
@@ -135,8 +145,6 @@ bool Inventory::reset() {
         Book* book = new Book; // Create new book (on heap)
         *book = buffer;        // Copy buffer book to new
         m_bookList.push_back(book); // Push to book list
-      } else {
-        throw runtime_error("Unable to read record");
       }
     }
 
@@ -247,7 +255,6 @@ Book* Inventory::getBook(unsigned index) {
     if(index >= m_bookList.size()) throw out_of_range("Out of Range");
 
     // For all items in book list
-    // TODO: critical: book file indices must start at 0, not 1
     for(unsigned i = 0; i < m_bookList.size(); i++) {
       if(m_bookList[i]->getFileIndex() == index)
         return m_bookList[i];
