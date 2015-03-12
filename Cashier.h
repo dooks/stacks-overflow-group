@@ -21,7 +21,8 @@ public:
 	bool clearCart();
 	bool purchaseCart();
 	double getSalesTax();
-	double getTotal();
+	double getSubTotal(Book* book);
+	double getTotal(Book* book);
 };
 #endif
 
