@@ -1,8 +1,23 @@
+#include <algorithm>
 #include "report.h"
 
 #include "inventory.h"
 #include "book.h"
 using std::vector;
+using std::sort;
+
+// Global comparison operators for sort
+bool _report_lessq(Book* left, Book* right) {
+  return (left->getQuantity() < right->getQuantity());
+}
+
+bool _report_lessw(Book* left, Book* right) {
+  return (left->getWholeCost() < right->getWholeCost());
+}
+
+bool _report_lessd(Book* left, Book* right) {
+  return (left->getDateAdded() < right->getDateAdded());
+}
 
 Report::Report(Inventory* inv) : m_inv(inv) { /* Initialize members */ }
 
@@ -33,12 +48,12 @@ vector<double> Report::getRetailList() {
   return retval; // return temp double vec
 }
 
-double Report::vecAdd(vector<double> vec) {
+double Report::vecAdd(const vector<double>& vec) {
   double retval = 0; // Create temp double
   for(unsigned i = 0; i < vec.size(); i++) { // for all items in vec list
     retval += vec[i]; // Add to double
   }
-  return 0; // return double
+  return retval; // return double
 }
 
 
@@ -109,12 +124,16 @@ void Report::sort(vector<Book*>(&list), Book::field field, bool) {
   switch(field) {
     case Book::QUANTITY:
       // Sort list by quantity
+      std::sort( list.begin(), list.end(), _report_lessq);
       break;
     case Book::WHOLECOST:
       // Sort list by wholesale cost
+      std::sort( list.begin(), list.end(), _report_lessw);
       break;
     case Book::DATEADDED:
       // Sort list by date added
+      std::sort( list.begin(), list.end(), _report_lessd);
       break;
   }
 }
+

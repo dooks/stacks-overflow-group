@@ -16,7 +16,7 @@ public:
   // Accessors
   vector<double> getWholeList();
   vector<double> getRetailList();
-  double         vecAdd(vector<double>);
+  double         vecAdd(const vector<double>&);
 
   // Inventory accessors
   vector<Book*> getAll();              // Does not sort
