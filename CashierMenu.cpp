@@ -5,9 +5,10 @@
 #include "Cashier.cpp""
 #include <iostream>
 using namespace std;
-string isbn, auth, title;
+string userisbn, userauth, usertitle;
 Inventory inv;
 Cashier cash;
+
 MainMenu main1;
 CashierMenu::CashierMenu()
 {};
@@ -32,10 +33,17 @@ void CashierMenu::submenu(int userCashMenu)
 	{
 	case 1:
 		cout << "Please enter the ISBN: " << endl;
-		cin >> isbn;
-		Cashier::findISBN(isbn);
+		std::getline(std::cin, userisbn);
+
 		//function call to search for isbn
 		cout << "ISBN         Title        Author      Price " << endl;
+		vector<Book*> isbnlist = cash.findISBN(userisbn);
+		for (unsigned i = 0; i < isbnlist.size(); i++)  {
+			cout << "";
+			cout << isbnlist[i]->getISBN() << "    " << isbnlist[i]->getTitle() << "     ";
+			cout << isbnlist[i]->getAuthor() << "     $" << isbnlist[i]->getRetailPrice() << endl;
+
+		}
 		//cout << 1. \n 2. \n  3. \n 4. \n 5. vector search results=true
 		//Please type the number of the selection you'd like to make.
 		void userSubmenu();
@@ -44,23 +52,41 @@ void CashierMenu::submenu(int userCashMenu)
 		break;
 	case 2:
 		cout << "Please enter the title: " << endl;
-		cin << searchTitle();
-		//function call to search for Title
+		std::getline(std::cin, usertitle);
+
+		//function call to search for title
 		cout << "ISBN         Title        Author      Price " << endl;
+		vector<Book*> titlelist = cash.findTitle(usertitle);
+		for (unsigned i = 0; i < titlelist.size(); i++)  {
+			cout << "";
+			cout << titlelist[i]->getISBN() << "    " << titlelist[i]->getTitle() << "     ";
+			cout << titlelist[i]->getAuthor() << "     $" << titlelist[i]->getRetailPrice() << endl;
+
+		}
 		//cout << 1. \n 2. \n  3. \n 4. \n 5. vector search results=true
 		//Please type the number of the selection you'd like to make.
-		userSubmenu();
-		cout << "If the book you're searching for is not found here please refine your search and try again.";
+		void userSubmenu();
+
+
 		break;
 	case 3:
-		cout << "Please enter the author's last name: " << endl;
-		cin << searchTitle();
-		//function call to search for Title
+		cout << "Please enter the author, last name first: " << endl;
+		std::getline(std::cin, userisbn);
+
+		//function call to search for author
 		cout << "ISBN         Title        Author      Price " << endl;
+		vector<Book*> authlist = cash.findAuthor(userauth);
+		for (unsigned i = 0; i < authlist.size(); i++)  {
+			cout << "";
+			cout << authlist[i]->getISBN() << "    " << authlist[i]->getTitle() << "     ";
+			cout << authlist[i]->getAuthor() << "     $" << authlist[i]->getRetailPrice() << endl;
+
+		}
 		//cout << 1. \n 2. \n  3. \n 4. \n 5. vector search results=true
 		//Please type the number of the selection you'd like to make.
-		userSubmenu();
-		cout << "If the book you're searching for is not found here please refine your search and try again.";
+		void userSubmenu();
+
+
 		break;
 	case 4:
 		cout << "You have chosen to remove a book from your cart" << endl;
