@@ -102,7 +102,6 @@ namespace DB {
         m_file->seekp(0, ios::end); // Set cursor to end of file
         book->setFileIndex(index);
         write(book, true); // Write book with used flag
-        //m_file->clear(); // Clear EOF flag? necessary?
       }
       return index;
     } catch(exception& e) {
@@ -112,9 +111,10 @@ namespace DB {
   }
 
   bool Local::read(Book* book) {
+    // Reset fail bits
+    m_file->clear();
+
     try {
-      // Reset fail bits
-      m_file->clear();
       seekr(0); // Seek to alignment of current record (redundant check)
 
       // Check if used record
@@ -170,9 +170,9 @@ namespace DB {
 
       // Check if book's index is within db size
       if(book->getFileIndex() <= m_dbSize) {
-        // Write record as unused
         bool temp = false;
         seekb(book->getFileIndex()); // Seek record at book's index
+        // Write record as unused
         m_file->write(reinterpret_cast<char*>(&temp), sizeof(bool));
         m_unusedIndex.push(book->getFileIndex()); // Add index to unused index
         return true;
