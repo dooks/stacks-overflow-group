@@ -7,15 +7,11 @@ using std::vector;
 
 class Report {
 private:
-  Inventory* inventory;
-  void sort(vector<Book*>&, Book::field); // Sort list by field
+  Inventory* m_inv; // Reference to inventory
+  void sort(vector<Book*>(&), Book::field, bool); // Sort list by field
 
 public:
-  Report();
   Report(Inventory*);
-
-  // Mutators
-  void setInventory(Inventory*);
 
   // Accessors
   vector<double> getWholeList();
@@ -23,8 +19,8 @@ public:
   double         vecAdd(vector<double>);
 
   // Inventory accessors
-  vector<Book*> getAll();              // Do not sort
+  vector<Book*> getAll();              // Does not sort
   vector<Book*> getSortQuantity(bool); // Sort by quantity, asc if true
-  vector<Book*> getSortWhole(bool);    // Sort by, asc if true
-  vector<Book*> getSortAge(bool);      // Sort by wholesale, asc if true
+  vector<Book*> getSortWhole(bool);    // Sort by wholesale, asc if true
+  vector<Book*> getSortAge(bool);      // Sort by date added, asc if true
 };
