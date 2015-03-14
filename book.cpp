@@ -1,8 +1,14 @@
 #include <string>
+#include <vector>
+#include <deque>
 #include "date.h"
-using std::string;
+using namespace std;
 
 #include "book.h"
+
+// Book Pool
+unsigned BookPool::m_cursize = 0;
+    char BookPool::m_maxsize = 0;
 
 Book::Book() {
   m_index = 0;
