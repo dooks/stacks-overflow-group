@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <string>
 #include <vector>
 #include <deque>
@@ -7,54 +8,90 @@ using namespace std;
 #include "book.h"
 
 // BookPoolSub
-BookPoolSub::BookPoolSub(unsigned size, deque<void*>& freeq) {
+BookPoolSub::BookPoolSub(size_t size, size_t size_class) {
   // Assign memory block to m_pool
-    // Memory block is size * (sizeof(Book) + 8byte padding)
-  // for i to size
-    // Create temp void*
-    // Assign address of m_pool + i to temp void*
-    // push back void* into freeq
+  // Memory block is size * (m_size_class + 8byte padding)
+  m_pool = malloc(size * (size_class - (size_class % 8) + 8));
 }
 
 BookPoolSub::~BookPoolSub() {
-  // deallocate m_pool
+  if(m_pool != NULL) {
+    free(m_pool); // deallocate m_pool
+  } else {
+    // Throw exception
+  }
 }
 
+deque<void*> BookPoolSub::segment() {
+  // BookPoolSub(num objects, sizeof Class)
+  deque<void*> retval; // Create temp void deque
+  char* m_pool_char = (char*) m_pool; // Temp base pool as char
+
+  for(size_t i = 0; i < m_size; i++) { // for i to m_size
+    void* temp; // Create temp void*
+    // Assign next pointer in block to temp
+    temp = m_pool_char + (i * m_size_class);
+    retval.push_back(temp); // push back void* into freeq
+  }
+  return retval;
+}
 
 
 
 // Book Pool
 // static declarations
 deque<void*> BookPool::m_free;
-vector<BookPoolSub*> BookPool::m_poolList;
+vector<BookPoolSub> BookPool::m_poolList;
 char BookPool::m_maxsize = POOL_INIT_SIZE;
 
-BookPoolSub* BookPool::Expand(size_t size) {
-  // Create new BookPoolSub with size
-    // Segment pool
-  // Return temp BookPoolSub
-  return NULL;
+void BookPool::Expand(size_t size) {
+  m_maxsize++; // Increase global size
+  BookPoolSub pool(m_maxsize, size); // Create new BookPoolSub with size
+  m_poolList.push_back(pool);
+
+  // Segment pool, and add free pointers to end of m_free
+  deque<void*> pool_free = pool.segment();
+  m_free.insert(m_free.end(), pool_free.begin(), pool_free.end());
 }
 
 void BookPool::Compress() {
   // Free higher size pools when not used
-  // TODO: Low priority
+  // TODO: Garbage collection - Low priority
   return;
 }
 
 void* BookPool::Allocate(size_t size) {
-  // Create temp void pointer to NULL
-  // if m_free is empty
-    // Pools are completely filled
-    // Expand pool, and push back into m_poolList
-  // set temp void pointer to front of m_free
-  // pop m_free
+  try {
+  void* retval = NULL; // Create temp void pointer to NULL
+  if(m_free.empty()) { // if m_free is empty
+    // TODO: Reorganize this.. expand and making free pointers should seperate
+    // The fact that m_free is being populated be very clear
+    Expand(size); // Expand pool
+
+    if(m_free.empty()) {
+      // Throw exception
+    }
+  }
+
+  // TODO: At this point, we need to guarantee m_free is not empty
+  // Otherwise it will cause undefined behavior
+  retval = m_free.front(); // set temp void pointer to front of m_free
+  m_free.pop_front(); // pop m_free
+
   // return temp void pointer
-  return NULL;
+  return retval;
+
+  } catch(exception& e) {
+    cerr << "BookPool::Allocate(): " << e.what() << endl;
+    return NULL;
+  }
 }
 
 void BookPool::Free(void* ptr)  {
   // Add ptr to front of m_free
+  m_free.push_front(ptr);
+
+  // TODO: compression logic - low priority
   return;
 }
 
@@ -100,7 +137,7 @@ Book::~Book() {}
 
 void* Book::operator new(size_t size) {
   try {
-    BookPool::Allocate(size);
+    return BookPool::Allocate(size);
   } catch(exception& e) {
     cerr << "Book::operator new: " << e.what() << endl;
     return NULL;

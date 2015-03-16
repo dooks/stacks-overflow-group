@@ -15,12 +15,16 @@ class BookPool;
 
 class BookPoolSub {
   friend class BookPool;
+  size_t m_size;          // Num of objects being allocated
+  size_t m_size_class;    // Size of objects being allocated
 
-  // Initialize with max number of Book objects for pool, and reference to
-  // deque of free pointers
-  BookPoolSub(unsigned, deque<void*>&);
-  ~BookPoolSub();         // Free memory pool
+  // Initialize with num of Book objects to allocate and size of class
+  BookPoolSub(size_t, size_t);
   void* m_pool;           // Pre-allocated block of memory
+  deque<void*> segment(); // Segment pool into void* based on sizes
+
+public:
+  ~BookPoolSub();         // Free memory pool
 };
 
 class BookPool {
@@ -33,11 +37,11 @@ class BookPool {
   ~BookPool();
 
   static deque<void*> m_free; // Free, usable void pointers
-  static vector<BookPoolSub*> m_poolList; // Each new pool is 1<<(n+1) in size
-  static char m_maxsize; // Current global total pool size, 1<<n
+  static vector<BookPoolSub> m_poolList; // Each new pool is 1<<(n+1) in size
+  static char m_maxsize;  // Current global total pool size, 1<<n
 
-  static BookPoolSub* Expand(size_t); // Create new pool list of 1<<(n+1)
-  static void Compress();             // Free higher size pools when not used
+  static void Expand(size_t); // New pool list of 1<<(n+1) with size of class
+  static void Compress(); // Free higher size pools when not used
 
 protected:
   // "Public" to Book... this is just for reference
