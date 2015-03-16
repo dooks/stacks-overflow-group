@@ -58,7 +58,7 @@ bool Inventory::updBook(Book* book) {
       throw domain_error("Book not currently in database");
     }
   } catch(exception& e) {
-    cerr << "Inventory::updBook(): "  << e.what() << endl;
+    cerr << "Inventory::updBook: "  << e.what() << endl;
   }
   return 0;
 }
@@ -77,7 +77,7 @@ bool Inventory::delBook(Book* book) {
       return false;
     }
   } catch(exception& e) {
-    cerr << "Inventory::delBook(): "  << e.what() << endl;
+    cerr << "Inventory::delBook: "  << e.what() << endl;
   }
   return 0;
 }
@@ -151,7 +151,7 @@ bool Inventory::reset() {
     m_db->close(); // Close database
     return true;
   } catch(exception& e) {
-    cerr << "Inventory::reset(): " << e.what() << endl;
+    cerr << "Inventory::reset: " << e.what() << endl;
     return false;
   }
 }
@@ -169,6 +169,7 @@ vector<Book*> Inventory::getRange(int f, int l) { // (first, last)
 
   try {
     if(first >= last) throw domain_error("Domain Error: first >= last");
+    if(m_bookList.empty()) throw domain_error("Domain Error: Book List empty");
 
     // check if first/last are within book list bounds
     try { m_bookList.at(first); }
