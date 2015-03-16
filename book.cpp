@@ -6,9 +6,58 @@ using namespace std;
 
 #include "book.h"
 
+// BookPoolSub
+BookPoolSub::BookPoolSub(unsigned size, deque<void*>& freeq) {
+  // Assign memory block to m_pool
+    // Memory block is size * (sizeof(Book) + 8byte padding)
+  // for i to size
+    // Create temp void*
+    // Assign address of m_pool + i to temp void*
+    // push back void* into freeq
+}
+
+BookPoolSub::~BookPoolSub() {
+  // deallocate m_pool
+}
+
+
+
+
 // Book Pool
-unsigned BookPool::m_cursize = 0;
-    char BookPool::m_maxsize = 0;
+// static declarations
+deque<void*> BookPool::m_free;
+vector<BookPoolSub*> BookPool::m_poolList;
+char BookPool::m_maxsize = POOL_INIT_SIZE;
+
+BookPoolSub* BookPool::Expand(size_t size) {
+  // Create new BookPoolSub with size
+    // Segment pool
+  // Return temp BookPoolSub
+  return NULL;
+}
+
+void BookPool::Compress() {
+  // Free higher size pools when not used
+  // TODO: Low priority
+  return;
+}
+
+void* BookPool::Allocate(size_t size) {
+  // Create temp void pointer to NULL
+  // if m_free is empty
+    // Pools are completely filled
+    // Expand pool, and push back into m_poolList
+  // set temp void pointer to front of m_free
+  // pop m_free
+  // return temp void pointer
+  return NULL;
+}
+
+void BookPool::Free(void* ptr)  {
+  // Add ptr to front of m_free
+  return;
+}
+
 
 Book::Book() {
   m_index = 0;
@@ -50,12 +99,21 @@ void Book::operator=(const Book& o) {
 Book::~Book() {}
 
 void* Book::operator new(size_t size) {
-  //return new Book();
-  return NULL;
+  try {
+    BookPool::Allocate(size);
+  } catch(exception& e) {
+    cerr << "Book::operator new: " << e.what() << endl;
+    return NULL;
+  }
 }
 
 void Book::operator delete(void* ptr) {
-  //delete ptr;
+  try {
+    BookPool::Free(ptr);
+  } catch(exception& e)  {
+    // Immediately throw exception
+    throw e;
+  }
 }
 
 void Book::setFileIndex(unsigned idx) { m_index = idx;        }
