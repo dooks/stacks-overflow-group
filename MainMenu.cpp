@@ -1,11 +1,13 @@
 #include "MainMenu.h"
 #include "inventory.h"
 #include "Cashier.h"
-#include "Cashier.cpp"
-#include "inventory.cpp"
+#include "db.h"
+#include "date.h"
+
+
 #include "book.h"
-#include "book.cpp"
-#include "report.cpp"
+
+
 #include "report.h"
 
 
@@ -13,16 +15,16 @@
 #include <iomanip>
 #include <iostream>
 using namespace std;
-int userchoice, Cashchoice,Invchoice,Repchoice;
+int userchoice, Cashchoice,Invchoice,Repchoice,cartchoice;
 string userisbn, userauth, usertitle,deletion;
 double total;
 Inventory inv;
-Cashier cash;
-Report rep;
+Cashier cash(&inv);
+Report rep(&inv);
 
 MainMenu::MainMenu()
 {
-
+	inv.reset();
 }
 void MainMenu::Menu1(int)
 {
@@ -82,21 +84,165 @@ void MainMenu::ReportMenu1(int)
 void MainMenu::CashMenuISBN(string)
 {
 	cout << "Please enter the ISBN: " << endl;
+	cin.clear();
+	fflush(stdin);
 	std::getline(std::cin, userisbn);
 
 	//function call to search for isbn
-	cout << "ISBN         Title        Author      Price " << endl;
+	cout << "   ISBN            Title               Author            Price " << endl;
 	vector<Book*> isbnlist = cash.findISBN(userisbn);
 	for (unsigned i = 0; i < isbnlist.size(); i++)  {
 		cout << "";
-		cout << isbnlist[i]->getISBN() << "    " << isbnlist[i]->getTitle() << "     ";
-		cout << isbnlist[i]->getAuthor() << "     $" << isbnlist[i]->getRetailPrice() << endl;
+		cout <<i+1<<". "<< isbnlist[i]->getISBN() << "    " 
+			<< isbnlist[i]->getTitle() << "     ";
+		cout << isbnlist[i]->getAuthor() << "     $"
+			<< isbnlist[i]->getRetailPrice() << endl;
 
 	}
+	cout << "Please type the number of the selection you'd like to add to your cart:" << endl;
+	cin >> cartchoice;
+	cartchoice = cartchoice - 1;
+
+
+	vector<Book*> cart = cash.findISBN(userisbn);
+	Book* book = cart[0];
+	for (unsigned i = 0; i < cart.size(); i++) {
+		if (cartchoice == i)
+		{
+
+	cash.addCart(book);
+
+		}
+	}
+	cout << cartchoice << endl;
+	/*for (unsigned i = 0; i < cart.size(); i++)  {
+		cout << "";
+		cout << i + 1 << ". " << cart[i]->getISBN() << "    "
+			<< cart[i]->getTitle() << "     ";
+		cout << cart[i]->getAuthor() << "     $"
+			<< cart[i]->getRetailPrice() << endl;
+
+	}*/
+	cout << "Your selection has been added to your cart" << endl;
 	//cout << 1. \n 2. \n  3. \n 4. \n 5. vector search results=true
 	//Please type the number of the selection you'd like to make.
-}
 
+}
+void MainMenu::CashMenuAuth(string)
+{
+	cout << "Please enter the author's name, last name first: " << endl;
+	cin.clear();
+	fflush(stdin);
+	std::getline(std::cin, userauth);
+
+	//function call to search for author
+	cout << "ISBN         Title        Author      Price " << endl;
+	vector<Book*> authlist = cash.findAuthor(userauth);
+	for (unsigned i = 0; i < authlist.size(); i++)  {
+		cout << "";
+		cout << i + 1 << ". " << authlist[i]->getISBN() << "    "
+			<< authlist[i]->getTitle() << "     ";
+		cout << authlist[i]->getAuthor() << "     $"
+			<< authlist[i]->getRetailPrice() << endl;
+		cout << i << endl;
+		cout << userisbn << endl;
+
+	}
+	cout << "Please type the number of the selection you'd like to add to your cart:" << endl;
+	cin >> cartchoice;
+	cartchoice = cartchoice - 1;
+
+
+	vector<Book*> cart = cash.findAuthor(userauth);
+	Book* book = cart[0];
+	for (unsigned i = 0; i < cart.size(); i++) {
+		if (cartchoice == i)
+		{
+
+			cash.addCart(book);
+
+		}
+	}
+	cout << cartchoice << endl;
+	/*for (unsigned i = 0; i < cart.size(); i++)  {
+	cout << "";
+	cout << i + 1 << ". " << cart[i]->getISBN() << "    "
+	<< cart[i]->getTitle() << "     ";
+	cout << cart[i]->getAuthor() << "     $"
+	<< cart[i]->getRetailPrice() << endl;
+
+	}*/
+	cout << "Your selection has been added to your cart" << endl;
+	//cout << 1. \n 2. \n  3. \n 4. \n 5. vector search results=true
+	//Please type the number of the selection you'd like to make.
+
+
+}
+void MainMenu::CashMenuTitle(string)
+{
+	cout << "Please enter the title: " << endl;
+	cin.clear();
+	fflush(stdin);
+	std::getline(std::cin, usertitle);
+
+	//function call to search for author
+	cout << "ISBN         Title        Author      Price " << endl;
+	vector<Book*> titlelist = cash.findAuthor(usertitle);
+	for (unsigned i = 0; i < titlelist.size(); i++)  {
+		cout << "";
+		cout << i + 1 << ". " << titlelist[i]->getISBN() << "    "
+			<< titlelist[i]->getTitle() << "     ";
+		cout << titlelist[i]->getAuthor() << "     $"
+			<< titlelist[i]->getRetailPrice() << endl;
+
+
+	}
+	cout << "Please type the number of the selection you'd like to add to your cart:" << endl;
+	cin >> cartchoice;
+	cartchoice = cartchoice - 1;
+
+
+	vector<Book*> cart = cash.findTitle(usertitle);
+	Book* book = cart[0];
+	for (unsigned i = 0; i < cart.size(); i++) {
+		if (cartchoice == i)
+		{
+
+			cash.addCart(book);
+
+		}
+	}
+	cout << cartchoice << endl;
+	/*for (unsigned i = 0; i < cart.size(); i++)  {
+	cout << "";
+	cout << i + 1 << ". " << cart[i]->getISBN() << "    "
+	<< cart[i]->getTitle() << "     ";
+	cout << cart[i]->getAuthor() << "     $"
+	<< cart[i]->getRetailPrice() << endl;
+
+	}*/
+	cout << "Your selection has been added to your cart" << endl;
+	//cout << 1. \n 2. \n  3. \n 4. \n 5. vector search results=true
+	//Please type the number of the selection you'd like to make.
+
+
+}
+void MainMenu::CartRemove(string)
+{
+	cout << "Please enter the title of the book you'd like to remove from your cart:" << endl;
+	cin >> usertitle;
+	/*for (unsigned i = 0; i < cart.size(); i++) {
+		if (usertitle == cart.getTitle())
+		{
+
+			cash.delCart(book);
+
+		}
+	}
+	*/
+}
+void MainMenu::BuyBooks(double)
+{}
 MainMenu::~MainMenu()
 {
 }
@@ -125,7 +271,7 @@ int main()
 			break;
 
 		case 5:
-			main.BuyBooks(total);
+			//main.BuyBooks(total);
 			break;
 		case 6:
 			main.Menu1(userchoice);
