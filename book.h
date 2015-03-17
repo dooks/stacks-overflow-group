@@ -34,10 +34,9 @@ class BookPool {
   BookPool();
   BookPool(const BookPool&);
   void operator=(const BookPool&);
-  ~BookPool();
 
   static deque<void*> m_free; // Free, usable void pointers
-  static vector<BookPoolSub> m_poolList; // Each new pool is 1<<(n+1) in size
+  static vector<BookPoolSub*> m_poolList; // Each new pool is 1<<(n+1) in size
   static char m_maxsize;  // Current global total pool size, 1<<n
 
   static void Expand(size_t); // New pool list of 1<<(n+1) with size of class
@@ -47,6 +46,9 @@ protected:
   // "Public" to Book... this is just for reference
   static void* Allocate(size_t); // Returns void pointer to block of size Book
   static void  Free(void*);      // Marks void pointer as unused
+
+public:
+  ~BookPool();
 };
 
 
