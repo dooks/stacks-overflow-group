@@ -18,13 +18,11 @@ using namespace std;
 int userchoice, Cashchoice,Invchoice,Repchoice,cartchoice;
 string userisbn, userauth, usertitle,deletion;
 double total;
-Inventory inv;
-Cashier cash(&inv);
-Report rep(&inv);
+
 
 MainMenu::MainMenu()
 {
-	inv.reset();
+
 }
 void MainMenu::Menu1(int)
 {
@@ -102,9 +100,14 @@ void MainMenu::CashMenuISBN(string)
 	cout << "Please type the number of the selection you'd like to add to your cart:" << endl;
 	cin >> cartchoice;
 	cartchoice = cartchoice - 1;
+	if (cartchoice>isbnlist.size())
+	{
+		cout << "There is no such selection. Please try again:" << endl;
+		cin >> cartchoice;
+	}
+	cash.addCart(isbnlist[cartchoice]);
 
-
-	vector<Book*> cart = cash.findISBN(userisbn);
+	/*vector<Book*> cart = cash.findISBN(userisbn);
 	Book* book = cart[0];
 	for (unsigned i = 0; i < cart.size(); i++) {
 		if (cartchoice == i)
@@ -115,7 +118,7 @@ void MainMenu::CashMenuISBN(string)
 		}
 	}
 	cout << cartchoice << endl;
-	/*for (unsigned i = 0; i < cart.size(); i++)  {
+	for (unsigned i = 0; i < cart.size(); i++)  {
 		cout << "";
 		cout << i + 1 << ". " << cart[i]->getISBN() << "    "
 			<< cart[i]->getTitle() << "     ";
@@ -126,8 +129,11 @@ void MainMenu::CashMenuISBN(string)
 	cout << "Your selection has been added to your cart" << endl;
 	//cout << 1. \n 2. \n  3. \n 4. \n 5. vector search results=true
 	//Please type the number of the selection you'd like to make.
+	system("pause");
+	MainMenu::CashMenu1(userchoice);
 
 }
+
 void MainMenu::CashMenuAuth(string)
 {
 	cout << "Please enter the author's name, last name first: " << endl;
@@ -175,7 +181,8 @@ void MainMenu::CashMenuAuth(string)
 	cout << "Your selection has been added to your cart" << endl;
 	//cout << 1. \n 2. \n  3. \n 4. \n 5. vector search results=true
 	//Please type the number of the selection you'd like to make.
-
+	system("pause");
+	
 
 }
 void MainMenu::CashMenuTitle(string)
@@ -248,7 +255,11 @@ MainMenu::~MainMenu()
 }
 int main()
 {
+	Inventory inv;
+	Cashier cash(&inv);
+	Report rep(&inv);
 	MainMenu main;
+	inv.reset();
 	main.Menu1(userchoice);
 	if (userchoice == 1)
 	{
