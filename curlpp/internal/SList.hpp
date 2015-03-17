@@ -27,7 +27,7 @@
 
 #include "buildconfig.h"
 
-#include <curl/curl.h>
+#include "../../curl/curl.h"
 
 #include <list>
 #include <string>

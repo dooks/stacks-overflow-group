@@ -28,7 +28,7 @@
 
 #include "Info.hpp"
 
-#include <curl/curl.h>
+#include "../curl/curl.h"
 
 #include <list>
 

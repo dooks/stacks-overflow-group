@@ -31,7 +31,7 @@
 
 #include "internal/buildconfig.h"
 
-#include <curl/curl.h>
+#include "../curl/curl.h"
 
 #include <string>
 #include <cstdlib>

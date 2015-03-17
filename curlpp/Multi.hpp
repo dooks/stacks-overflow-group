@@ -25,7 +25,7 @@
 #define CURLPP_MULTI_HPP
 
 
-#include <curl/multi.h>
+#include "../curl/multi.h"
 
 #include <list>
 #include <map>
