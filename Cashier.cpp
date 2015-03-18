@@ -1,5 +1,5 @@
 
-#include "Cashier.h" 
+#include "Cashier.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -48,6 +48,20 @@ bool Cashier::addCart(Book* book) {
 	/*
 	Add book to cart list
 	*/
+
+	// Check if book is in cart
+	for(unsigned i = 0; i < m_cartlist.size(); i++) {
+		if(m_cartlist[i] ==  ) {
+			// If book exists in cart
+			// Change increment quantity instead
+			m_cartlist[i]->setQuantity( m_cartlist[i]->getQuantity() + 1 );
+
+			// return function
+			return true;
+		}
+	}
+
+	//
 	m_cartlist.push_back(book);
 	return true;
 }
@@ -55,7 +69,8 @@ bool Cashier::addCart(Book* book) {
 bool Cashier::delCart(Book* book) {
 	/*
 	If book is in cart list
-	erase from cart list
+	decrement from cart list... if it goes to zero
+
 	*/
 	for (unsigned i = 0; i < m_cartlist.size(); i++)
 	{
@@ -75,16 +90,31 @@ bool Cashier::clearCart() {
 	return true;
 }
 
+vector<Book*> Cashier::getCart() {
+	return m_cartlist;
+}
+
 bool Cashier::purchaseCart() {
 	/*
 	For each item in cart list
 	delete book from inventory
 	Clear cart list
 	*/
+
 	for (unsigned i = 0; i < m_cartlist.size(); i++)
 	{
-		inv->delBook(m_cartlist[i]);
+		// If quantity of this book is greater than one
+		// delete book for # quantity
+		//(m_cartlist[i]->getQuantity > 1)
+		if (m_cartlist[i]->getQuantity > 1)
+		{
+			for (int j=0; j < m_cartlist[i]->getQuantity-1; j++)
+			{
+			inv->delBook(m_cartlist[i])
+			}
+		}
 
+		inv->delBook(m_cartlist[i]);
 	}
 	m_cartlist.clear();
 	return true;

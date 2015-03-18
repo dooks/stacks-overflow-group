@@ -14,6 +14,7 @@ Cashier* Menu::m_cash  = NULL;
 Report* Menu::m_report = NULL;
 
 vector<Book*> Menu::m_tempList;
+vector<double> Menu::m_doubleList;
 Book*		  Menu::m_tempBook;
 
 
@@ -22,6 +23,61 @@ Menu::Menu(Inventory* inv, Cashier* cash) {
 	m_cash = cash;
 }
 
+
+// Cashier Menu Functions
+MenuCashier::MenuCashier() { }
+MenuCashier::~MenuCashier() { }
+
+void MenuCashier::displayHeader() {
+	cout << "Welcome to Serendipity Booksellers" << endl;
+}
+
+void MenuCashier::displayBody(int state) {
+	cout << "Qty" << setw(9) << right << "ISBN" << setw(15) << right <<"Title" << setw(25) << right << "Price" << setw(15) << right << "Total" << endl;
+	cout << "________________________________________________________________"
+	vector<Book*> temp_cart = m_cash.getCart();
+	for (unsigned i = 0; i < temp_cart.size(); i++) {
+		cout << temp_cart[i]->getQuantity() << setw(9) << right << temp_cart[i]->getISBN()
+				 << setw(15) << right << temp_cart[i]->getTItle() << setw(25) << right << temp_cart[i]->getRetailPrice() << setw(15) << right << temp_cart->getQuantity() * temp_cart->getRetailPrice() << endl;
+		cout << setprecision(2) << fixed;
+	}
+
+	// Receipt/Final transaction
+	if (state == 1)
+	{
+		cout << "Subtotal:" << setw(10) << right << m_cash.getSub();
+		cout << "Sales Tax:" << setw(10) << right << m_cash.getSalesTax();
+		cout << "Total:" << setw(10) << right << m_cash.getTotal();
+	}
+	else
+		system("pause");
+}
+void MenuCashier::displayFooter(){
+	cout << "1: Add a book" << endl;
+	cout << "2: Remove a book" << endl;
+	cout << "3: Finalize Transaction" << endl;
+	cout << "Thank you for shopping at Serendipity Booksellers" << endl;
+}
+
+//Inventory Menu Functions
+MenuInventory::MenuInventory(){ }
+MenuInventory::~MenuInventory(){ }
+
+void MenuInventory::displayHeader(){
+	cout << "Welcome to Serendipity Booksellers" << endl;
+}
+void MenuInventory::displayBody(int state){
+	cout << "ISBN:"
+	cout << "Title:"
+	cout << "Author:"
+	cout << "Publisher:"
+	cout << "Date Added:"
+	cout << "Quantity-On-Hand"
+}
+void MenuInventory::displayFooter(){
+	cout << "thank you for shopping at Serendipity Booksellers" << endl;
+}
+/*
 //void MainMenu::Menu1(int)
 //{
 //	userchoice = 0;
@@ -255,7 +311,7 @@ Menu::Menu(Inventory* inv, Cashier* cash) {
 //
 //void MainMenu::BuyBooks(double)
 //{}
-
+*/
 
 
 

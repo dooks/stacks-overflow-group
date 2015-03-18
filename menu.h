@@ -36,6 +36,10 @@ public:
 	void getState();
 };
 
+
+
+
+
 class MenuCashier : public Menu {
 public:
 	MenuCashier();
