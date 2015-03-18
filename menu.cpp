@@ -36,10 +36,11 @@ void MenuCashier::displayHeader() {
 void MenuCashier::displayBody(int state) {
 	cout << "Qty" << setw(9) << right << "ISBN" << setw(15) << right <<"Title" << setw(25) << right << "Price" << setw(15) << right << "Total" << endl;
 	cout << "________________________________________________________________"
-	vector<Book*> temp_cart = m_cash.getCart();
-	for (unsigned i = 0; i < temp_cart.size(); i++) {
-		cout << temp_cart[i]->getQuantity() << setw(9) << right << temp_cart[i]->getISBN()
-				 << setw(15) << right << temp_cart[i]->getTItle() << setw(25) << right << temp_cart[i]->getRetailPrice() << setw(15) << right << temp_cart->getQuantity() * temp_cart->getRetailPrice() << endl;
+	for (unsigned i = 0; i < Menu::m_tempList.size(); i++) {
+		cout << Menu::m_tempList[i]->getQuantity() << setw(9) << right << Menu::m_tempList[i]->getISBN()
+				 << setw(15) << right << Menu::m_tempList[i]->getTItle() << setw(25) << right
+				 << Menu::m_tempList[i]->getRetailPrice() << setw(15) << right
+				 << Menu::m_tempList->getQuantity() * Menu::m_tempList->getRetailPrice() << endl;
 		cout << setprecision(2) << fixed;
 	}
 
@@ -63,7 +64,7 @@ MenuInventory::MenuInventory(){ }
 MenuInventory::~MenuInventory(){ }
 
 void MenuInventory::displayHeader(){
-	cout << "Welcome to Serendipity Booksellers" << endl;
+	cout << "Serendipity Booksellers - Inventory Menu" << endl;
 
 void MenuInventory::displayBody(){
 	cout << "Look up a book" << endl;
@@ -74,7 +75,7 @@ void MenuInventory::displayBody(){
 }
 
 void MenuInventory::displayFooter(){
-	cout << "thank you for shopping at Serendipity Booksellers" << endl;
+	cout << "" << endl;
 }
 
 
@@ -82,20 +83,26 @@ void MenuInventory::displayFooter(){
 MenuReport::MenuReport();
 MenuReport::~MenuReport();
 void MenuReport::displayHeader(){
-	
+	cout << "Serendipity Booksellers - Report Menu" << endl;
 }
 void MenuReport::displayBody(){
-	
+	cout << "1. Inventory Listing" << endl;
+	cout << "2. Inventory Wholesale Value" << endl;
+	cout << "3. Inventory Retail Value" << endl;
+	cout << "4. Listing by Quantity" << endl;
+	cout << "5. Listing by Cost" << endl;
+	cout << "6. Listing by Age" << endl;
+	cout << "7. Return to Main Menu" << endl;
 }
 void MenuReport::displayFooter(){
-	
+	cout << "Enter your Choice:" << endl;
 }
 
 //Book List Menu Functions
 MenuBookList::MenuBookList();
 MenuBookList::~MenuBookLIst();
 void MenuBookList::displayHeader(){
-	
+	cout << "Serendipity Booksellers - Book Info Menu" << endl;
 }
 
 void MenuBookList::displayBody(int state){
@@ -108,7 +115,7 @@ void MenuBookList::displayBody(int state){
 }
 
 void MenuBookList::displayFooter(){
-	
+
 }
 /*
 //void MainMenu::Menu1(int)

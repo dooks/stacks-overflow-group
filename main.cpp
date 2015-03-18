@@ -29,10 +29,10 @@ int main() {
 								  	// 2 - cashier
 								  	// 3 - inventory
 								  	// 4 - report
-								  	// 5 - quit
-								  	// 6 - book search
-								  	// 7 - display booklist
-								  	// 8 - add book
+								  	// 5 - book search
+								  	// 6 - display booklist
+								  	// 7 - add book
+								  	// 8 - quit
 	int prev_state = 0;
 
 	int substate = 0; // 0 - none
@@ -75,41 +75,36 @@ int main() {
 				}
 
 			case 2: // case state cashier module
+				Menu::m_tempList = cash.getCart(); // Set temp list to cart
 				menu_cash.displayHeader(); // display cashier body
 				menu_cash.displayBody();
 				menu_cash.displayFooter();
 
-				prev_state= 2;
 				switch(input.getCh()) { // switch input
 					case 1: // case 1: add book
 						prev_state=2; // set last state to cashier
 						state=6;// switch state to search
 						substate=4;// switch substate to add cart
-						state = prev_state; // return to last state
 						break;
 					case 2: // case 2: remove book
 						prev_state=2;// set last state to cashier
 						state=6;// switch state to search
 						substate=2;// switch substate to delete book(cart)
-						state = prev_state;// return to last state
 						break;
 					case 3: // case 3: finalize transaction
 						prev_state=2;// set last state to cashier
-						state=7;// switch state to display book list(cart)
+						state=7;// switch state to display book list
 						substate=5;// switch substate to checkout
-						state = prev_state;// return to last state
 						break;
 					case 4: // case 4: return to previous menu
 						state=1;// switch state to main menu
 						break;
-					default:
-						// TODO: ? Later, what should we do for this
-						break;
+					// TODO: default behavior
 				}
 
 			case 3: // case state inventory module
 				menu_inv.displayHeader(); // display inventory header
-				menu_inv.displayBody(); // display inventory body
+				menu_inv.displayBody(); 	// display inventory body
 				menu_inv.displayFooter(); // display inventory footer
 				prev_state = 3; // set last state to inventory
 
@@ -191,7 +186,7 @@ int main() {
 					insert voodoo black magic here;	// assign to menu temp list
 					state=7;// set state to display book list
 					break;
-			case 7: // case display book list
+			case 6: // case display book list
 				// display book list
 				// book list is Menu::m_tempList
 				char temp_input = input.getCh();
@@ -248,88 +243,116 @@ int main() {
 					case 'q';// case Q
 					case 'Q';// case Q
 						state = prev_state;// go to previous state
-			if (substate == 1)	// substate delete book
-				{
-					inv.delBook(Menu::m_tempBook);  	//switch state to delete book
+				}
+
+				if (substate == 1) {	// substate delete book
+						inv.delBook(Menu::m_tempBook);  	//switch state to delete book
+						state = prev_state;
+					}
+				if (substate == 2) {	// substate remove from cart
+					cash.delCart(Menu::m_tempBook);
 					state = prev_state;
 				}
-			if (substate == 2)	// substate remove from cart
-			{
-				cash.delCart(Menu::m_tempBook);
-				state = prev_state;
-			}
 
-			if (substate == 3)  				// substate edit book
-					{
-						// case substate edit book
-				// prompt user select field to change
-					// case 1: isbn
-					// case 2: author
-					// case 3: title
-					// case 4: publisher
-					// case 5: date added
-					// case 6: wholesale price
-					// case 7: retail price
-					// case 8: quantity
-				// user input change
-				// return to last state
+				if (substate == 3) { // substate edit book
+					switch(input.getCh()) { // prompt user select field to change
+						case 1: // case 1: isbn
+							string temp = input.getLine(); // TODO: validate input
+							Menu::m_tempBook->setISBN(temp);
+							break;
+						case 2: // case 2: author
+							string temp = input.getLine(); // TODO: validate input
+							Menu::m_tempBook->setAuthor(temp);
+						case 3:// case 3: title
+							string temp = input.getLine();
+							Menu::m_tempBook->setTitle(temp);
+							break;
+						case 4: // case 4: publisher
+							string temp = input.getLine();
+							Menu::m_tempBook->setTitle(temp);
+							break;
+						case 5: // case 5: date added
+							string temp;
+							date dtemp;
 
-			if (substate == 4)	// substate add to cart
-					{
-					cash.addCart(Menu::m_tempBook);
-					//switch state to add to cart
-					Menu::m_tempBook = NULL; // Clear temp buffer
+							cout << "Month: ";
+							temp = input.getLine();
+							dtemp.setMonth(dtemp);
+
+							cout << "Day: ";
+							temp = input.getLine();
+							dtemp.setDay(dtemp);
+
+							cout << "Year: ";
+							temp = input.getLine();
+							dtemp.setYear(dtemp);
+							Menu::m_tempBook->setDateAdded(dtemp);
+							break;
+						case 6: // case 6: wholesale price
+							string temp = input.getLine();
+							Menu::m_tempBook->setWholeCost(temp);
+							break;
+						case 7: // case 7: retail price
+							string temp = input.getLine();
+							Menu::m_tempBook->setRetailPrice(temp);
+							break;
+						case 8: // case 8: quantity
+							string temp = input.getLine();
+							Menu::m_tempBook->setQuantity(temp);
+							break;
+					}
+					// return to last state
+					state = prev_state;
 				}
 
-			if (substate == 5) // checkout
-			{
-				menu_cash.displaycheckout();
-			}
+				if (substate == 4)	{ // substate add to cart
+						cash.addCart(Menu::m_tempBook);	// add to cart
+						Menu::m_tempBook = NULL; // Clear temp buffer
+				}
 
-			substate=0; // Clear substate
-			break;
+				if (substate == 5) // checkout
+				{
+					menu_cash.displaycheckout(); // TODO <--- ?
+				}
+
+				substate=0; // Clear substate
+				break;
 
 
-			// case state add book
-				// create new menu temp book and prompt user for:
-				// prompt user for isbn
-				// prompt user for title
-				// prompt user for author
-				// prompt user for publisher
-				// prompt user for year added
-				// prompt user for month added
-				// prompt user for day added
-				// prompt user for wholesale price
-				// prompt user for retail price
-				// ??? add book logic, come back to this
-				// return to last state
+			case 7:  // case state add book
+				menu_inv.displayHeader();// create new menu temp book and prompt user for:
+				menu_inv.displayBody();// create new menu temp book and prompt user for:
+				menu_inv.displayFooter();// create new menu temp book and prompt user for:
+				
+				string temp;
+				Menu::m_tempBook = new Book;
+				cout << "ISBN: "; getLine(cin, temp);
+				Menu::m_tempBook->setISBN(temp);// prompt user for isbn
+				cout << "Title: "; getLine(cin, temp);
+				Menu::m_tempBook->setTitle(temp);// prompt user for title
+				cout << "Author: "; getLine(cin, temp);
+				Menu::m_tempBook->setAuthor(temp);// prompt user for author
+				cout << "Publisher: "; getLine(cin, temp);
+				Menu::m_tempBook->setPublisher(temp);// prompt user for publisher
+				cout << "Month Added: "; getLine(cin, temp);
+				Menu::m_tempBook->setMonth(stoi(temp));// prompt user for month added
+				cout << "Day Added: "; getLine(cin, temp);
+				Menu::m_tempBook->setDay(stoi(temp));// prompt user for day added
+				cout << "Year Added: "; getLine(cin, temp);
+				Menu::m_tempBook->setYear(stoi(temp));// prompt user for year added
+				cout << "Wholesale Cost: "; getLine(cin, temp);
+				Menu::m_tempBook->setWholesale(stod(temp));// prompt user for wholesale price
+				cout << "Retail Price: "; getLine(cin, temp);
+				Menu::m_tempBook->setRetailPrice(stoid(temp));// prompt user for retail price
+				
+				inv.addBook(Menu::m_tempBook);
+				Menu::m_tempBook = NULL;
+				
+				state=prev_state;// return to last state
+				break;
 
-			// case substate edit book
-				// prompt user select field to change
-					// case 1: isbn
-					// case 2: author
-					// case 3: title
-					// case 4: publisher
-					// case 5: date added
-					// case 6: wholesale price
-					// case 7: retail price
-					// case 8: quantity
-				// user input change
-				// return to last state
-
-			// case substate add to cart
-				//user selection added to cart list
-
-			// case substate delete book
-				// user selection deleted
-
-			// case substate checkout
-				// append sales information to booklist
-				// delete book(s)
-
-			// case quit
-				// set quit to true
-
+			case 8: // case quit
+				quit = true; // set quit to true
 		}
 	}
 

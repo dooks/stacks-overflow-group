@@ -7,3 +7,9 @@ char Input::getCh() {
   char retval = cin.get();
   return retval;
 }
+
+string Input::getLine() {
+  string retval;
+  getLine(cin, retval);
+  return retval;
+}
