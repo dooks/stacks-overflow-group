@@ -105,7 +105,9 @@ void MenuBookList::displayHeader(){
 	cout << "Serendipity Booksellers - Book Info Menu" << endl;
 }
 
-void MenuBookList::displayBody(int state){
+void MenuBookList::displayBody(int first, int last){
+	vector<Book*> temp = Menu::m_tempList(
+		Menu::m_tempList.begin() + first, Menu::m_tempList.begin() + last);
 	cout << "ISBN:"
 	cout << "Title:"
 	cout << "Author:"

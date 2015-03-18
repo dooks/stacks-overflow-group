@@ -5,15 +5,36 @@
 #include "input.h"
 #include "pager.h"
 
+#define PAGER_SIZE 10
+#define STATE_SPLASH		0
+#define STATE_CASHIER		1
+#define STATE_MAIN			2
+#define STATE_INVENTORY	3
+#define STATE_REPORT		4
+#define STATE_SEARCH		4
+#define STATE_DISPLAY		5
+#define STATE_ADD				6
+#define STATE_QUIT			7
+#define STATE_DANCE			8
+
+#define STATE_SUB_NONE				0
+#define STATE_SUB_DELETE			0
+#define STATE_SUB_CART_DELETE	0
+#define STATE_SUB_EDIT				0
+#define STATE_SUB_CART_ADD		0
+#define STATE_SUB_CHECKOUT		0
+
 int main() {
 	// Modules
-	Inventory inv;				// Inventory module
-	inv.reset();					// Initialize inventory, default location is
-												// "tools/books.db"
-	Input input;					// Input module
-	Pager pager();				// Pager to assist displaying items
-	Cashier cash(&inv);		// Handles transactions and cart
-	Report report(&inv);	// Handles displaying data
+	Inventory inv;					// Inventory module
+	inv.reset();						// Initialize inventory, default location is
+													// "tools/books.db"
+	Input input;						// Input module
+	Pager pager();					// Pager to assist displaying items
+	Cashier cash(&inv);			// Handles transactions and cart
+	Report report(&inv);		// Handles displaying data
+
+	pager.setPageSize(PAGER_SIZE);	// Number of items to display per page
 
 	// Menu modules
 	Menu menu_main(&inv, &cash);
@@ -33,6 +54,7 @@ int main() {
 								  	// 6 - display booklist
 								  	// 7 - add book
 								  	// 8 - quit
+								  	// 9 - dance
 	int prev_state = 0;
 
 	int substate = 0; // 0 - none
@@ -53,13 +75,16 @@ int main() {
 				input.getCh();	// wait for any key
 				state = 1; // switch state to main menu
 				break;
+
 			case 1: // case state main menu
 				menu_main.displayHeader(); // display main menu header
 				menu_main.displayBody();   // display main menu body
 				menu_main.displayFooter(); // display main menu footer
+
+				prev_state = 1; // set last state to main menu
 				switch(input.getCh()) { // switch input
 					case 1: // case 1: cashier
-						state = 2;// switch state to cashier
+						state = 2; // switch state to cashier
 						break;
 
 					case 2: // case 2: inventory
@@ -71,165 +96,187 @@ int main() {
 						break;
 
 					case 4: // case 4: quit
-						bool quit = true;	// switch state to quit
+						state = 8; // switch state to quit
 				}
+				break;
 
 			case 2: // case state cashier module
 				Menu::m_tempList = cash.getCart(); // Set temp list to cart
-				menu_cash.displayHeader(); // display cashier body
+				menu_cash.displayHeader(); // display cashier menu
 				menu_cash.displayBody();
 				menu_cash.displayFooter();
 
+				prev_state = 2; // set last state to cashier
 				switch(input.getCh()) { // switch input
 					case 1: // case 1: add book
-						prev_state=2; // set last state to cashier
-						state=6;// switch state to search
-						substate=4;// switch substate to add cart
+						state 		 = 5; // switch state to search
+						substate	 = 4; // switch substate to add cart
 						break;
 					case 2: // case 2: remove book
-						prev_state=2;// set last state to cashier
-						state=6;// switch state to search
-						substate=2;// switch substate to delete book(cart)
+						state			 = 5; // switch state to search
+						substate	 = 2; // switch substate to delete book(cart)
 						break;
 					case 3: // case 3: finalize transaction
-						prev_state=2;// set last state to cashier
-						state=7;// switch state to display book list
-						substate=5;// switch substate to checkout
+						state		 	 = 6; // switch state to display book list
+						substate	 = 5; // switch substate to checkout
 						break;
-					case 4: // case 4: return to previous menu
-						state=1;// switch state to main menu
+					case 4: // case 4: return to main menu
+						state			 = 1;// switch state to main menu
 						break;
 					// TODO: default behavior
 				}
+				break;
 
 			case 3: // case state inventory module
 				menu_inv.displayHeader(); // display inventory header
 				menu_inv.displayBody(); 	// display inventory body
 				menu_inv.displayFooter(); // display inventory footer
-				prev_state = 3; // set last state to inventory
 
+				prev_state = 3; // set last state to inventory
 				switch(input.getCh()) { // switch input
 					case 1: // case 1: look up book
-						state 	 = 6; // switch state to search
+						state 		 = 5; // switch state to search
 						break;
 					case 2: // case 2: add a book
-						state 	 = 8; // switch state to add book
+						state 	   = 7; // switch state to add book
 						break;
 					case 3: // case 3: edit a book's record
-						state 	 = 6; // switch state to search
-						substate = 3; // switch substate to edit book
+						state 	 	 = 5; // switch state to search
+						substate	 = 3; // switch substate to edit book
 						break;
 					case 4: // case 4: delete a book
-						state 	 = 6; // switch state to search
-						substate = 1; // switch substate to delete book
+						state 		 = 5; // switch state to search
+						substate	 = 1; // switch substate to delete book
 						break;
 					case 5: // case 5: return to previous menu
-						state		 = 1; // switch state to main menu
+						state			 = 1; // switch state to main menu
 						break;
 				}
+				break;
 
 			case 4: // case state report module
 					menu_report.displayHeader(); // display report body
 					menu_report.displayBody();	 // display report body
 					menu_report.displayFooter(); // display report body
 
-					prev_state = 4;
-
+					prev_state = 4; // set previous state to report
 					switch(input.getCh()) { //switch input
 						case 1: // case 1: list all books
-							prev_state=4;
-							state = 7; // switch state to display book list
-							state=prev_state;
+							Menu::m_tempList = report.getAll();
+							pager.setLength(Menu::m_tempList.size());
+							state = 6; // switch state to display book list
 							break;
 						case 2: // case 2: list by wholesale price
-							prev_state=4;
-							state =7;// switch state to display book list(wholesale & total)
-							state=prev_state;
+							Menu::m_doubleList = report.getWholeList();
+							pager.setLength(Menu::m_tempList.size());
+							state = 6; // switch state to display book list(wholesale & total)
 							break;
 						case 3: // case 3: list by retail price
-							prev_state=4;
-							state = 7;// switch state to display book list(retail & total)
-							state=prev_state;
+							Menu::m_doubleList = report.getWholeList();
+							pager.setLength(Menu::m_tempList.size());
+							state = 6; // switch state to display book list(retail & total)
 							break;
-						case 4: // case 4: list by quantity
-							prev_state=4;
-							state = 7;// switch state to display book list
-							state=prev_state;
+						case 4: // case 4: list by quantity, desc
+							Menu::m_tempList = report.getSortQuantity(false);
+							pager.setLength(Menu::m_tempList.size());
+							state = 6; // switch state to display book list
 							break;
-						case 5: // case 5: list by cost
-							prev_state=4;
-							state = 7;// switch state to display book list
-							state=prev_state;
+						case 5: // case 5: list by cost, desc
+							Menu::m_tempList = report.getSortWhole(false);
+							pager.setLength(Menu::m_tempList.size());
+							state = 6; // switch state to display book list
 							break;
-
-						case 6:  // case 6: list by age
-							prev_state=4;
-							state=7;// switch state to display book list
-							state=prev_state;
+						case 6:  // case 6: list by age, desc
+							Menu::m_tempList = report.getSortAge(false);
+							pager.setLength(Menu::m_tempList.size());
+							state = 6; // switch state to display book list
 							break;
 						case 7:  	// case 7: return to previous menu
-							prevstate=4;
-							state=7;// switch state to main menu
-							state=prev_state;
+							state = 1; // switch state to main menu
 							break;
 						case 8:  // case 8: DANCE PARTY
-							prevstate=4;
-							state=9;
-							state=prev_state;
+							state = 9;
 							break;
 					}
 					break;
 
 			case 5:	// case state book search
-					menu_search.displayBody();// display search body
-					menu_search.displayPrompt();// prompt user for search term
-					insert voodoo black magic here;	// assign to menu temp list
-					state=7;// set state to display book list
+					//menu_search.displayBody();		// display search body
+					//menu_search.displayPrompt();	// prompt user for which field to search fo
+
+					string temp;
+					switch(input.getCh()) { // prompt user select field to change
+						case 1: // case 1: isbn
+							temp = input.getLine();
+							Menu::m_tempList = inv.find(Book::ISBN, temp);
+							break;
+						case 2: // case 2: author
+							temp = input.getLine();
+							Menu::m_tempList = inv.find(Book::AUTHOR, temp);
+						case 3:// case 3: title
+							temp = input.getLine();
+							Menu::m_tempList = inv.find(Book::TITLE, temp);
+							break;
+						case 4: // case 4: publisher
+							temp = input.getLine();
+							Menu::m_tempList = inv.find(Book::PUBLISHER, temp);
+							break;
+						// case 5: // case 5: date added
+						// 	date dtemp;
+
+						// 	cout << "Month: ";
+						// 	temp = input.getLine();
+						// 	dtemp.setMonth(dtemp);
+
+						// 	cout << "Day: ";
+						// 	temp = input.getLine();
+						// 	dtemp.setDay(dtemp);
+
+						// 	cout << "Year: ";
+						// 	temp = input.getLine();
+						// 	dtemp.setYear(dtemp);
+						// 	Menu::m_tempList = inv.find(Book::DATEADDED, dtemp);
+
+						// 	break;
+						case 6: // case 6: wholesale price
+							temp = input.getLine();
+							Menu::m_tempList = inv.find(Book::WHOLECOST, stod(temp));
+							break;
+						case 7: // case 7: retail price
+							temp = input.getLine();
+							Menu::m_tempList = inv.find(Book::RETAILPRICE, stod(temp));
+							break;
+						case 8: // case 8: quantity
+							temp = input.getLine();
+							Menu::m_tempList = inv.find(Book::QUANTITY, stoi(temp));
+							break;
+						default:
+							// If search fails, return all?
+							Menu::m_tempList = inv.getRange(0, inv.getSize());
+					}
+
+					pager.setLength(Menu::m_tempList.size());
+					state = 6;// set state to display book list
+
 					break;
+
 			case 6: // case display book list
 				// display book list
 				// book list is Menu::m_tempList
 				char temp_input = input.getCh();
+
 				switch(temp_input) {// switch user input
-					case 1: 						// Select book from list and save into temp book
-						Menu::m_tempBook = Menu::m_tempList[0];
-						state = prev_state;// switch to last state
-						break;// case 1-10: user select given book
-					case 2:						// Select book from list and save into temp book
-						Menu::m_tempBook = Menu::m_tempList[1];
-						state = prev_state;// switch to last state
-						break;
-					case 3:						// Select book from list and save into temp book
-						Menu::m_tempBook = Menu::m_tempList[2];
-						state = prev_state;// switch to last state
-						break;
-					case 4:						// Select book from list and save into temp book
-						Menu::m_tempBook = Menu::m_tempList[3];
-						state = prev_state;// switch to last state
-						break;
-					case 5:						// Select book from list and save into temp book
-						Menu::m_tempBook = Menu::m_tempList[4];
-						state = prev_state;// switch to last state
-						break;
-					case 6:						// Select book from list and save into temp book
-						Menu::m_tempBook = Menu::m_tempList[5];
-						state = prev_state;// switch to last state
-						break;
-					case 7:						// Select book from list and save into temp book
-						Menu::m_tempBook = Menu::m_tempList[6];
-						state = prev_state;// switch to last state
-						break;
-					case 8:						// Select book from list and save into temp book
-						Menu::m_tempBook = Menu::m_tempList[7];
-						state = prev_state;// switch to last state
-						break;
-					case 9:						// Select book from list and save into temp book
-						Menu::m_tempBook = Menu::m_tempList[8];
-						state = prev_state;// switch to last state
-						break;
-					case 10:
-						// Select book from list and save into temp book
-						Menu::m_tempBook = Menu::m_tempList[9];
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+					case 5:
+					case 6:
+					case 7:
+					case 8:
+					case 9:
+					case 10: // case 1-10: user select given book
+						Menu::m_tempBook = Menu::m_tempList[(unsigned) temp_input - 1];
 						state = prev_state;// switch to last state
 						break;
 					case 'n';// case N
@@ -323,7 +370,7 @@ int main() {
 				menu_inv.displayHeader();// create new menu temp book and prompt user for:
 				menu_inv.displayBody();// create new menu temp book and prompt user for:
 				menu_inv.displayFooter();// create new menu temp book and prompt user for:
-				
+
 				string temp;
 				Menu::m_tempBook = new Book;
 				cout << "ISBN: "; getLine(cin, temp);
@@ -344,10 +391,10 @@ int main() {
 				Menu::m_tempBook->setWholesale(stod(temp));// prompt user for wholesale price
 				cout << "Retail Price: "; getLine(cin, temp);
 				Menu::m_tempBook->setRetailPrice(stoid(temp));// prompt user for retail price
-				
+
 				inv.addBook(Menu::m_tempBook);
 				Menu::m_tempBook = NULL;
-				
+
 				state=prev_state;// return to last state
 				break;
 

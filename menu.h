@@ -72,8 +72,8 @@ class MenuReport : public Menu {
 class MenuBookList : public Menu {
 	MenuBookList();
 	~MenuBookList();
-	
+
 	void displayHeader();
-	void displayBody(int);		  // Displays body based on state
+	void displayBody(int first, int last); // Displ
 	void displayFooter();
 }

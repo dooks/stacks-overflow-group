@@ -2,7 +2,7 @@
 #include "pager.h"
 using namespace std;
 
-Pager::Pager(int page_size = 1) :
+Pager::Pager(unsigned page_size = 1) :
   m_cursor(0), m_pageNumber(0), m_pageSize(page_size), m_numElements(0) {}
 
 // Accessors
