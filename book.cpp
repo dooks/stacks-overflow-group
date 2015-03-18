@@ -200,6 +200,9 @@ void Book::setPublisher(string publisher) {
   strcpy_s(m_publisher, publisher.c_str());
 }
 void Book::setQuantity(int quantity) { m_quantity = quantity; }
+void Book::setDateAdded(date& tdate) {
+  m_dateAdded = tdate;
+}
 void Book::setDateAdded(int month, int day, int year) {
   m_dateAdded.setMonth(month);
       m_dateAdded.setDay(day);

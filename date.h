@@ -14,6 +14,7 @@ public:
   void setMonth(int);
   void setDay(int);
   void setYear(int);
+  void operator=(const date& op);
 
   // Accessors
   int getMonth();

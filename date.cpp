@@ -11,6 +11,11 @@ date::date(int mm, int dd, int yyyy) : // Initialize with MM-DD-YYYY format
 void date::setMonth(int month) { m_month = month; }
 void   date::setDay(int   day) {   m_day =   day; }
 void  date::setYear(int  year) {  m_year =  year; }
+void date::operator=(const date& op) {
+  m_month = op.m_month;
+    m_day = op.m_day;
+   m_year = op.m_year;
+}
 
 // Accessors
 int date::getMonth() { return m_month; }

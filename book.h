@@ -86,6 +86,7 @@ public:
   void setAuthor(string);
   void setPublisher(string);
   void setDateAdded(int, int, int);
+  void setDateAdded(date&);
   void setQuantity(int);
   void setWholeCost(double);
   void setRetailPrice(double);

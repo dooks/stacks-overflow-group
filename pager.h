@@ -12,6 +12,7 @@ class Pager {
 public:
   enum dir { UP, DOWN, LEFT, RIGHT };
 
+  Pager();
   Pager(unsigned page_size);
 
   // Mutators

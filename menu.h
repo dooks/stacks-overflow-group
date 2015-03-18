@@ -74,6 +74,6 @@ class MenuBookList : public Menu {
 	~MenuBookList();
 
 	void displayHeader();
-	void displayBody(int first, int last); // Displ
+	void displayBody(int first, int last); // Displays based on range
 	void displayFooter();
 }

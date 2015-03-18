@@ -2,6 +2,9 @@
 #include "pager.h"
 using namespace std;
 
+Pager::Pager() :
+  m_cursor(0), m_pageNumber(0), m_pageSize(1), m_numElements(0) {}
+
 Pager::Pager(unsigned page_size = 1) :
   m_cursor(0), m_pageNumber(0), m_pageSize(page_size), m_numElements(0) {}
 
