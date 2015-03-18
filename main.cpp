@@ -6,15 +6,38 @@
 #include "pager.h"
 
 int main() {
-	// Initialize all modules
-	Inventory inv;
-	Input input;
-	Cashier cash(&inv);
-	Report report(&inv);
-	Menu main(&inv, &cash);
-	inv.reset();
+	// Modules
+	Inventory inv;				// Inventory module
+	inv.reset();					// Initialize inventory, default location is
+												// "tools/books.db"
+	Input input;					// Input module
+	Cashier cash(&inv);		// Handles transactions and cart
+	Report report(&inv);	// Handles displaying data
 
-	int state = 0;
+	// Menu modules
+	Menu menu_main(&inv, &cash);
+	MenuCashier menu_cash;
+	MenuInventory menu_inv;
+	//MenuBookList menu_list;
+
+
+	// Main globals
+	int state = 0;		// 0 - splash page
+								  	// 1 - main menu
+								  	// 2 - cashier
+								  	// 3 - inventory
+								  	// 4 - report
+								  	// 5 - quit
+								  	// 6 - book search
+								  	// 7 - display booklist
+								  	// 8 - add book
+	int prev_state = 0;
+
+	int substate = 0; // 0 - none
+										// 1 - delete book
+										// 2 - edit book
+										// 3 - add to cart
+
 	bool quit = false;
 
 	//main.Menu1(userchoice);
@@ -22,62 +45,81 @@ int main() {
 	while(!quit) {
 		// Prompt program splash
 		switch(state) {
-			// case state splash screen
-				// wait for any key
-				// switch state to main menu
+			case 0: // case state splash screen
+				input.getCh();	// wait for any key
+				state = 1; // switch state to main menu
+				break;
+			case 1: // case state main menu
+				menu_main.displayHeader(); // display main menu header
+				menu_main.displayBody();   // display main menu body
+				menu_main.displayFooter(); // display main menu footer
+				switch(input.getCh()) { // switch input
+					case 1: // case 1: cashier
+						state = 2;// switch state to cashier
+						break;
 
-			// case state main menu
-				// display main menu body
-				// switch input
-					// case 1: cashier
-						// switch state to cashier
-					// case 2: inventory
-						// switch state to inventory
-					// case 3: report
-						// switch state to report
-					// case 4: quit
-						// switch state to return 0
+					case 2: // case 2: inventory
+						state = 3; // switch state to inventory
+						break;
 
-			// case state cashier module
-				// display cashier body
-				// switch input
-					// case 1: add book
-						// set last state to cashier
-						// switch state to search
-						// switch substate to add cart
+					case 3: // case 3: report
+						state = 4; // switch state to report
+						break;
+
+					case 4: // case 4: quit
+						bool quit = true;	// switch state to quit
+				}
+
+			case 2: // case state cashier module
+				menu_cash.displayHeader(); // display cashier body
+				switch(input.getCh()) { // switch input
+					case 1: // case 1: add book
+						prev_state=2; // set last state to cashier
+						state=6;// switch state to search
+						substate=4;// switch substate to add cart
+						state = prev_state; // return to last state
+						break;
+					case 2: // case 2: remove book
+						prev_state=2;// set last state to cashier
+						state=6;// switch state to search
+						substate=1;// switch substate to delete book(cart)
+						state = prev_state;// return to last state
+						break;
+					case 3: // case 3: finalize transaction
+						prev_state=2;// set last state to cashier
+						state=7;// switch state to display book list(cart)
+						substate=// switch substate to checkout
 						// return to last state
-					// case 2: remove book
-						// set last state to cashier
-						// switch state to search
-						// switch substate to delete book(cart)
-						// return to last state
-					// case 3: finalize transaction
-						// set last state to main menu
-						// switch state to display book list(cart)
-						// switch substate to checkout
-						// return to last state
-					// case 4: return to previous menu
+						break;
+					case 4: // case 4: return to previous menu
 						// switch state to main menu
+						break;
+					default:
+						// TODO: ? Later, what should we do for this
+						break;
+				}
 
-			// case state inventory module
-				// display inventory body
-				// switch input
-					// case 1: look up book
-						//set last state to inventory
-						// switch state to search
-					// case 2: add a book
-						// set last state to inventory
-						// switch state to add book
-					// case 3: edit a book's record
-						// set last state to inventory
-						// switch state to search
-						// switch substate to edit book
-					// case 4: delete a book
-						// set last state to inventory
-						// switch state to search
-						// switch substate to delete book
-					// case 6: return to previous menu
-						// switch state to main menu
+			case 3: // case state inventory module
+				menu_inv.displayHeader(); // display inventory header
+				menu_inv.displayBody(); // display inventory body
+				menu_inv.displayFooter(); // display inventory footer
+
+				prev_state = 3; // set last state to inventory
+
+				switch(input.getCh()) { // switch input
+					case 1: // case 1: look up book
+						state 	 = 6; // switch state to search
+					case 2: // case 2: add a book
+						state 	 = 8; // switch state to add book
+					case 3: // case 3: edit a book's record
+						state 	 = 6; // switch state to search
+						substate = 2; // switch substate to edit book
+					case 4: // case 4: delete a book
+						state 	 = 6; // switch state to search
+						substate = 1; // switch substate to delete book
+					case 5: // case 5: return to previous menu
+						state		 = 1; // switch state to main menu
+				}
 
 			// case state report module
 					// display report body
@@ -132,7 +174,7 @@ int main() {
 
 
 			// case state add book
-				// create temporary book
+				// create new menu temp book and prompt user for:
 				// prompt user for isbn
 				// prompt user for title
 				// prompt user for author
@@ -142,6 +184,8 @@ int main() {
 				// prompt user for day added
 				// prompt user for wholesale price
 				// prompt user for retail price
+				// ??? add book logic, come back to this
+				// return to last state
 
 			// case substate edit book
 				// prompt user select field to change

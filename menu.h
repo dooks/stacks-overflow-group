@@ -68,3 +68,12 @@ class MenuReport : public Menu {
 	void displayBody(int);			// Displays body based on state
 	void displayFooter();
 };
+
+class MenuBookList : public Menu {
+	MenuBookList();
+	~MenuBookList();
+	
+	void displayHeader();
+	void displayBody(int);		  // Displays body based on state
+	void displayFooter();
+}

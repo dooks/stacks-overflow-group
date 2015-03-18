@@ -18,9 +18,10 @@ vector<double> Menu::m_doubleList;
 Book*		  Menu::m_tempBook;
 
 
-Menu::Menu(Inventory* inv, Cashier* cash) {
+Menu::Menu(Inventory* inv, Cashier* cash, Report* report) {
 	m_inv = inv;
 	m_cash = cash;
+	m_report = report;
 }
 
 
@@ -65,8 +66,27 @@ MenuInventory::~MenuInventory(){ }
 
 void MenuInventory::displayHeader(){
 	cout << "Welcome to Serendipity Booksellers" << endl;
+
+void MenuInventory::displayBody(){
+
 }
-void MenuInventory::displayBody(int state){
+
+void MenuInventory::displayFooter(){
+	cout << "thank you for shopping at Serendipity Booksellers" << endl;
+}
+
+}
+//Report Menu Functions
+MenuReport::MenuReport();
+MenuReport::~MenuReport();
+//Book List Menu Functions
+MenuBookList::MenuBookList();
+MenuBookList::~MenuBookLIst();
+void MenuBookList::displayHeader(){
+	
+}
+
+void MenuBookList::displayBody(int state){
 	cout << "ISBN:"
 	cout << "Title:"
 	cout << "Author:"
@@ -74,8 +94,9 @@ void MenuInventory::displayBody(int state){
 	cout << "Date Added:"
 	cout << "Quantity-On-Hand"
 }
-void MenuInventory::displayFooter(){
-	cout << "thank you for shopping at Serendipity Booksellers" << endl;
+
+void MenuBookList::displayFooter(){
+	
 }
 /*
 //void MainMenu::Menu1(int)
