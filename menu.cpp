@@ -50,8 +50,6 @@ void MenuCashier::displayBody(int state) {
 		cout << "Sales Tax:" << setw(10) << right << m_cash.getSalesTax();
 		cout << "Total:" << setw(10) << right << m_cash.getTotal();
 	}
-	else
-		system("pause");
 }
 void MenuCashier::displayFooter(){
 	cout << "1: Add a book" << endl;
@@ -68,17 +66,31 @@ void MenuInventory::displayHeader(){
 	cout << "Welcome to Serendipity Booksellers" << endl;
 
 void MenuInventory::displayBody(){
-
+	cout << "Look up a book" << endl;
+	cout << "Add a book" << endl;
+	cout << "Edit a book's record" << endl;
+	cout << "Delete a book" << endl;
+	cout << "Return to the Main Menu" << endl;
 }
 
 void MenuInventory::displayFooter(){
 	cout << "thank you for shopping at Serendipity Booksellers" << endl;
 }
 
-}
+
 //Report Menu Functions
 MenuReport::MenuReport();
 MenuReport::~MenuReport();
+void MenuReport::displayHeader(){
+	
+}
+void MenuReport::displayBody(){
+	
+}
+void MenuReport::displayFooter(){
+	
+}
+
 //Book List Menu Functions
 MenuBookList::MenuBookList();
 MenuBookList::~MenuBookLIst();

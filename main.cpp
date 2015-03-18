@@ -11,6 +11,7 @@ int main() {
 	inv.reset();					// Initialize inventory, default location is
 												// "tools/books.db"
 	Input input;					// Input module
+	Pager pager();				// Pager to assist displaying items
 	Cashier cash(&inv);		// Handles transactions and cart
 	Report report(&inv);	// Handles displaying data
 
@@ -19,6 +20,7 @@ int main() {
 	MenuCashier menu_cash;
 	MenuInventory menu_inv;
 	//MenuBookList menu_list;
+	MenuReport menu_report;
 
 
 	// Main globals
@@ -35,8 +37,10 @@ int main() {
 
 	int substate = 0; // 0 - none
 										// 1 - delete book
-										// 2 - edit book
-										// 3 - add to cart
+										// 2 - delete from cart
+										// 3 - edit book
+										// 4 - add to cart
+										// 5 - checkout
 
 	bool quit = false;
 
@@ -72,6 +76,10 @@ int main() {
 
 			case 2: // case state cashier module
 				menu_cash.displayHeader(); // display cashier body
+				menu_cash.displayBody();
+				menu_cash.displayFooter();
+
+				prev_state= 2;
 				switch(input.getCh()) { // switch input
 					case 1: // case 1: add book
 						prev_state=2; // set last state to cashier
@@ -82,17 +90,17 @@ int main() {
 					case 2: // case 2: remove book
 						prev_state=2;// set last state to cashier
 						state=6;// switch state to search
-						substate=1;// switch substate to delete book(cart)
+						substate=2;// switch substate to delete book(cart)
 						state = prev_state;// return to last state
 						break;
 					case 3: // case 3: finalize transaction
 						prev_state=2;// set last state to cashier
 						state=7;// switch state to display book list(cart)
-						substate=// switch substate to checkout
-						// return to last state
+						substate=5;// switch substate to checkout
+						state = prev_state;// return to last state
 						break;
 					case 4: // case 4: return to previous menu
-						// switch state to main menu
+						state=1;// switch state to main menu
 						break;
 					default:
 						// TODO: ? Later, what should we do for this
@@ -103,74 +111,183 @@ int main() {
 				menu_inv.displayHeader(); // display inventory header
 				menu_inv.displayBody(); // display inventory body
 				menu_inv.displayFooter(); // display inventory footer
-
 				prev_state = 3; // set last state to inventory
 
 				switch(input.getCh()) { // switch input
 					case 1: // case 1: look up book
 						state 	 = 6; // switch state to search
+						break;
 					case 2: // case 2: add a book
 						state 	 = 8; // switch state to add book
+						break;
 					case 3: // case 3: edit a book's record
 						state 	 = 6; // switch state to search
-						substate = 2; // switch substate to edit book
+						substate = 3; // switch substate to edit book
+						break;
 					case 4: // case 4: delete a book
 						state 	 = 6; // switch state to search
 						substate = 1; // switch substate to delete book
+						break;
 					case 5: // case 5: return to previous menu
 						state		 = 1; // switch state to main menu
+						break;
 				}
 
-			// case state report module
-					// display report body
-					//switch input
-						// case 1: list all books
-							// set last state to report
-							// switch state to display book list
-						// case 2: list by wholesale price
-							// set last state to report
-							// switch state to display book list(wholesale & total)
-						// case 3: list by retail price
-							// set last state to report
-							// switch state to display book list(retail & total)
-						// case 4: list by quantity
-							// set last state to report
-							// switch state to display book list
-						// case 5: list by cost
-							// set last state to report
-							// switch state to display book list
-						// case 6: list by age
-							// set last state to report
-							// switch state to display book list
-						// case 7: return to previous menu
-							// switch state to main menu
-						// case 8: DANCE PARTY
+			case 4: // case state report module
+					menu_report.displayHeader(); // display report body
+					menu_report.displayBody();	 // display report body
+					menu_report.displayFooter(); // display report body
 
-			// case state book search
-				// display search body
-				// prompt user for search term
-				// assign to menu temp list
-				// set state to display book list
-			// case display book list
+					prev_state = 4;
+
+					switch(input.getCh()) { //switch input
+						case 1: // case 1: list all books
+							prev_state=4;
+							state = 7; // switch state to display book list
+							state=prev_state;
+							break;
+						case 2: // case 2: list by wholesale price
+							prev_state=4;
+							state =7;// switch state to display book list(wholesale & total)
+							state=prev_state;
+							break;
+						case 3: // case 3: list by retail price
+							prev_state=4;
+							state = 7;// switch state to display book list(retail & total)
+							state=prev_state;
+							break;
+						case 4: // case 4: list by quantity
+							prev_state=4;
+							state = 7;// switch state to display book list
+							state=prev_state;
+							break;
+						case 5: // case 5: list by cost
+							prev_state=4;
+							state = 7;// switch state to display book list
+							state=prev_state;
+							break;
+
+						case 6:  // case 6: list by age
+							prev_state=4;
+							state=7;// switch state to display book list
+							state=prev_state;
+							break;
+						case 7:  	// case 7: return to previous menu
+							prevstate=4;
+							state=7;// switch state to main menu
+							state=prev_state;
+							break;
+						case 8:  // case 8: DANCE PARTY
+							prevstate=4;
+							state=9;
+							state=prev_state;
+							break;
+					}
+					break;
+
+			case 5:	// case state book search
+					menu_search.displayBody();// display search body
+					menu_search.displayPrompt();// prompt user for search term
+					insert voodoo black magic here;	// assign to menu temp list
+					state=7;// set state to display book list
+					break;
+			case 7: // case display book list
 				// display book list
-				// switch user input
-					// case (book index)
-						// switch state to display a book
-					// case 1-10: user select given book
-						// switch to last state
-					// case N
-						// go to next page
-					// case P
-						// go to previous page
-					// case Q
-						// go to previous state
-				// substate delete book
-					//switch state to delete book
-				// substate add to cart
+				// book list is Menu::m_tempList
+				char temp_input = input.getCh();
+				switch(temp_input) {// switch user input
+					case 1: 						// Select book from list and save into temp book
+						Menu::m_tempBook = Menu::m_tempList[0];
+						state = prev_state;// switch to last state
+						break;// case 1-10: user select given book
+					case 2:						// Select book from list and save into temp book
+						Menu::m_tempBook = Menu::m_tempList[1];
+						state = prev_state;// switch to last state
+						break;
+					case 3:						// Select book from list and save into temp book
+						Menu::m_tempBook = Menu::m_tempList[2];
+						state = prev_state;// switch to last state
+						break;
+					case 4:						// Select book from list and save into temp book
+						Menu::m_tempBook = Menu::m_tempList[3];
+						state = prev_state;// switch to last state
+						break;
+					case 5:						// Select book from list and save into temp book
+						Menu::m_tempBook = Menu::m_tempList[4];
+						state = prev_state;// switch to last state
+						break;
+					case 6:						// Select book from list and save into temp book
+						Menu::m_tempBook = Menu::m_tempList[5];
+						state = prev_state;// switch to last state
+						break;
+					case 7:						// Select book from list and save into temp book
+						Menu::m_tempBook = Menu::m_tempList[6];
+						state = prev_state;// switch to last state
+						break;
+					case 8:						// Select book from list and save into temp book
+						Menu::m_tempBook = Menu::m_tempList[7];
+						state = prev_state;// switch to last state
+						break;
+					case 9:						// Select book from list and save into temp book
+						Menu::m_tempBook = Menu::m_tempList[8];
+						state = prev_state;// switch to last state
+						break;
+					case 10:
+						// Select book from list and save into temp book
+						Menu::m_tempBook = Menu::m_tempList[9];
+						state = prev_state;// switch to last state
+						break;
+					case 'n';// case N
+					case 'N';// case N
+						pager.movePage(down);
+						break;// go to next page
+					case 'p';// case P
+					case 'P';// case P
+						pager.movePage(up);
+						break;// go to previous page
+					case 'q';// case Q
+					case 'Q';// case Q
+						state = prev_state;// go to previous state
+			if (substate == 1)	// substate delete book
+				{
+					inv.delBook(Menu::m_tempBook);  	//switch state to delete book
+					state = prev_state;
+				}
+			if (substate == 2)	// substate remove from cart
+			{
+				cash.delCart(Menu::m_tempBook);
+				state = prev_state;
+			}
+
+			if (substate == 3)  				// substate edit book
+					{
+						// case substate edit book
+				// prompt user select field to change
+					// case 1: isbn
+					// case 2: author
+					// case 3: title
+					// case 4: publisher
+					// case 5: date added
+					// case 6: wholesale price
+					// case 7: retail price
+					// case 8: quantity
+				// user input change
+				// return to last state
+
+			if (substate == 4)	// substate add to cart
+					{
+					cash.addCart(Menu::m_tempBook);
 					//switch state to add to cart
-				// substate edit book
-					//switch state to edit book
-				// clear substate
+					Menu::m_tempBook = NULL; // Clear temp buffer
+				}
+
+			if (substate == 5) // checkout
+			{
+				menu_cash.displaycheckout();
+			}
+
+			substate=0; // Clear substate
+			break;
 
 
 			// case state add book
