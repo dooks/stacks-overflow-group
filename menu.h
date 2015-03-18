@@ -29,12 +29,6 @@ public:
   virtual void displayHeader();
   virtual void displayBody();
   virtual void displayFooter();
-
-  // Mutators
-  void setState();
-
-  // Accessors
-  void getState();
 };
 
 

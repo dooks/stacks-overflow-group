@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 using namespace std;
 
 #include "menu.h"
@@ -236,19 +237,19 @@ int main() {
               break;
             case 6: { // case 6: wholesale price
               temp = input.getLine();
-              double dtemp = stod(temp);
+              double dtemp = atof(temp.c_str());
               Menu::m_tempList = inv.findBook(Book::WHOLECOST, &dtemp);
               break;
               }
             case 7: { // case 7: retail price
               temp = input.getLine();
-              double dtemp = stod(temp);
+              double dtemp = atof(temp.c_str());
               Menu::m_tempList = inv.findBook(Book::RETAILPRICE, &dtemp);
               break;
               }
             case 8: { // case 8: quantity
               temp = input.getLine();
-              double itemp = stoi(temp);
+              double itemp = atoi(temp.c_str());
               Menu::m_tempList = inv.findBook(Book::QUANTITY, &itemp);
               break;
               }
@@ -328,29 +329,29 @@ int main() {
 
               cout << "Month: ";
               temp = input.getLine();
-              dtemp.setMonth(stoi(temp));
+              dtemp.setMonth(atoi(temp.c_str()));
 
               cout << "Day: ";
               temp = input.getLine();
-              dtemp.setDay(stoi(temp));
+              dtemp.setDay(atoi(temp.c_str()));
 
               cout << "Year: ";
               temp = input.getLine();
-              dtemp.setYear(stoi(temp));
+              dtemp.setYear(atoi(temp.c_str()));
               Menu::m_tempBook->setDateAdded(dtemp);
               break;
               }
             case 6: // case 6: wholesale price
               temp = input.getLine();
-              Menu::m_tempBook->setWholeCost(stod(temp));
+              Menu::m_tempBook->setWholeCost(atof(temp.c_str()));
               break;
             case 7: // case 7: retail price
               temp = input.getLine();
-              Menu::m_tempBook->setRetailPrice(stod(temp));
+              Menu::m_tempBook->setRetailPrice(atof(temp.c_str()));
               break;
             case 8: // case 8: quantity
               temp = input.getLine();
-              Menu::m_tempBook->setQuantity(stoi(temp));
+              Menu::m_tempBook->setQuantity(atoi(temp.c_str()));
               break;
           }
           // return to last state
@@ -393,9 +394,9 @@ int main() {
         //cout << "Year Added: "; getline(cin, temp);
         //Menu::m_tempBook->setYear(stoi(temp));// prompt user for year added
         cout << "Wholesale Cost: "; getline(cin, temp);
-        Menu::m_tempBook->setWholeCost(stod(temp));// prompt user for wholesale price
+        Menu::m_tempBook->setWholeCost(atof(temp.c_str()));// prompt user for wholesale price
         cout << "Retail Price: "; getline(cin, temp);
-        Menu::m_tempBook->setRetailPrice(stoi(temp));// prompt user for retail price
+        Menu::m_tempBook->setRetailPrice(atoi(temp.c_str()));// prompt user for retail price
 
         inv.addBook(Menu::m_tempBook);
         Menu::m_tempBook = NULL;
