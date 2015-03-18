@@ -126,10 +126,7 @@ namespace DB {
         return false; // Skip record
       }
 
-      Book* temp = new Book;
-      m_file->read(reinterpret_cast<char*>(temp), sizeof(Book)); // Save record at cursor into book
-      *book = *temp; // Deep copy....? Hopefully
-      delete temp;
+      m_file->read(reinterpret_cast<char*>(book), sizeof(Book)); // Save record at cursor into book
 
       seekr(1); // Move to next record
       return true;

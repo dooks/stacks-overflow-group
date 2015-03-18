@@ -105,7 +105,7 @@ bool Cashier::purchaseCart() {
   {
     // If quantity of this book is greater than one
     // delete book for # quantity
-    //(m_cartlist[i]->getQuantity > 1)
+
     if (m_cartlist[i]->getQuantity() > 1) {
       for (int j = 0; j < m_cartlist[i]->getQuantity() - 1; j++) {
         inv->delBook(m_cartlist[i]);
@@ -117,44 +117,25 @@ bool Cashier::purchaseCart() {
   m_cartlist.clear();
   return true;
 }
+
 double Cashier::getSalesTax(){
   /*
   Returns sales tax
   */
-  double salestax = 1.0875;
-  return salestax;
+  double salestax = 0.0875; // TODO: change this to global #define
+  double retval = getSubTotal() * salestax;
+  return retval;
 }
-double Cashier::getSubTotal(Book* book){
+
+double Cashier::getSubTotal(){
   /*
-  if book is in cart list, add retail price to subtotal
-  return subtotal
+     Get subtotal of all items in cart
   */
+
   double subtotal = 0;
-  for (unsigned i = 0; i < m_cartlist.size(); i++)
-  {
-    if (book == m_cartlist[i]) {
-      // If book matches item in list, this item's subtotal is added
-      subtotal += m_cartlist[i]->getRetailPrice();
-    }
+  for (unsigned i = 0; i < m_cartlist.size(); i++) {
+    // If book matches item in list, this item's subtotal is added
+    subtotal += m_cartlist[i]->getRetailPrice();
   }
   return subtotal;
-}
-double Cashier::getTotal(Book* book){
-
-  /*
-  if book is in cart list, add retail price to subtotal
-  multiply subtotal by salestax
-  return total
-  */
-  double subtotal = 0;
-  double total = 0;
-  for (unsigned i = 0; i < m_cartlist.size(); i++)
-  {
-    if (book == m_cartlist[i]) {
-      // If book matches item in list, this item's subtotal is added
-      subtotal += m_cartlist[i]->getRetailPrice();
-    }
-  }
-  total = subtotal*getSalesTax();
-  return total;
 }

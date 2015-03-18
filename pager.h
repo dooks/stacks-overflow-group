@@ -16,10 +16,10 @@ public:
   Pager(unsigned page_size);
 
   // Mutators
-  void setPageSize(int);
-  void   setLength(int);
-  void  moveCursor(dir);
-  void    movePage(dir);
+  void setPageSize(int); // Change number of items to display per page
+  void   setLength(int); // Change number of total items
+  void  moveCursor(dir); // pages left/right, moves one item up/down
+  void    movePage(dir); // Pages left/right
 
   // Accessors
   int getPageNumber(); // Current page number

@@ -1,5 +1,7 @@
 #pragma once
+#include <iostream>
 #include <string>
+using namespace std;
 
 class date {
   int m_month;
@@ -15,6 +17,7 @@ public:
   void setDay(int);
   void setYear(int);
   void operator=(const date& op);
+  friend ostream& operator<<(ostream&, date&);
 
   // Accessors
   int getMonth();

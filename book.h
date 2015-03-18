@@ -76,8 +76,8 @@ public:
   Book(const Book&);            // Copy
   ~Book();
   void  operator=(const Book&); // Assignment
-  void* operator   new(size_t);
-  void  operator delete(void*);
+  //void* operator   new(size_t);
+  //void  operator delete(void*);
 
   // Mutators
   void setFileIndex(unsigned);

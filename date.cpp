@@ -1,5 +1,6 @@
+#include <iostream>
 #include "date.h"
-using std::string;
+using namespace std;
 
 // Constructors
 date::date() : m_month(0), m_day(0), m_year(0) { }
@@ -15,6 +16,12 @@ void date::operator=(const date& op) {
   m_month = op.m_month;
     m_day = op.m_day;
    m_year = op.m_year;
+}
+
+ostream& operator<<(ostream& os, date& obj) {
+  string retval = obj.str();
+  os << retval;
+  return os;
 }
 
 // Accessors

@@ -171,24 +171,24 @@ void Book::operator=(const Book& o) {
 }
 Book::~Book() {}
 
-void* Book::operator new(size_t size) {
-  try {
-    return BookPool::Allocate(size);
-  } catch(exception& e) {
-    cerr << "Book::operator new: " << e.what() << endl;
-    return NULL;
-  }
-}
+//void* Book::operator new(size_t size) {
+  //try {
+    //return BookPool::Allocate(size);
+  //} catch(exception& e) {
+    //cerr << "Book::operator new: " << e.what() << endl;
+    //return NULL;
+  //}
+//}
 
-void Book::operator delete(void* ptr) {
-  try {
-    BookPool::Free(ptr);
-  } catch(exception& e)  {
-    // Immediately throw exception
-    cerr << "Book::operator delete: " << e.what() << endl;
-    throw e;
-  }
-}
+//void Book::operator delete(void* ptr) {
+  //try {
+    //BookPool::Free(ptr);
+  //} catch(exception& e)  {
+    //// Immediately throw exception
+    //cerr << "Book::operator delete: " << e.what() << endl;
+    //throw e;
+  //}
+//}
 
 void Book::setFileIndex(unsigned idx) { m_index = idx;        }
 void Book::setISBN(string isbn)    {

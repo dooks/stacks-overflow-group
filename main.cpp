@@ -11,8 +11,8 @@ using namespace std;
 
 // Program states
 #define STATE_SPLASH    0
-#define STATE_CASHIER   1
-#define STATE_MAIN      2
+#define STATE_MAIN      1
+#define STATE_CASHIER   2
 #define STATE_INVENTORY 3
 #define STATE_REPORT    4
 #define STATE_SEARCH    5
@@ -41,7 +41,8 @@ int main() {
   pager.setPageSize(PAGER_SIZE);  // Number of items to display per page
 
   // Menu modules
-  Menu menu_main(&inv, &cash);
+  Menu::Initialize(&inv, &cash, &report);
+  Menu menu_main;
   MenuCashier menu_cash;
   MenuInventory menu_inv;
   //MenuBookList menu_list;
@@ -76,6 +77,10 @@ int main() {
     // Prompt program splash
     switch(state) {
       case 0: // case state splash screen
+        cout << "Serendipity Booksellers POS" << endl;
+        cout << "Press any key to continue..." << endl;
+        menu_main.displayFooter();
+
         input.getCh();  // wait for any key
         state = STATE_MAIN; // switch state to main menu
         break;
@@ -227,9 +232,8 @@ int main() {
               break;
             case 5: // case 5: date added
               temp = input.getLine();
-              Menu::m_tempList = inv.find(Book::DATEADDED, );
-
-            //  break;
+              Menu::m_tempList = inv.findBook(Book::DATEADDED, &temp);
+              break;
             case 6: { // case 6: wholesale price
               temp = input.getLine();
               double dtemp = stod(temp);

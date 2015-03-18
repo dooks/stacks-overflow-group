@@ -5,84 +5,136 @@ using namespace std;
 
 #include "menu.h"
 #include "book.h"
+#include "date.h"
 #include "report.h"
 #include "inventory.h"
 #include "Cashier.h"
 
+#define W_SPACER 30
+
+
+// Static globals
 Inventory* Menu::m_inv = NULL;
 Cashier* Menu::m_cash  = NULL;
 Report* Menu::m_report = NULL;
 
+// Static buffers
 vector<Book*> Menu::m_tempList;
 vector<double> Menu::m_doubleList;
 Book*     Menu::m_tempBook;
 
+Menu::~Menu() { /* No garbage collection necessary */ }
 
-Menu::Menu(Inventory* inv, Cashier* cash, Report* report) {
+void Menu::Initialize(Inventory* inv, Cashier* cash, Report* report) {
   m_inv = inv;
   m_cash = cash;
   m_report = report;
 }
 
+void Menu::displayHeader() {
+  system("cls");
+  cout << "Serendipity Booksellers :: Main Menu" << endl;
+  cout << setfill('=') << setw(W_SPACER) << "" << "\n\n";
+  cout << setfill(' ');
+}
+
+void Menu::displayBody() {
+  cout << "1. Cashier Module"   << endl;
+  cout << "2. Inventory Module" << endl;
+  cout << "3. Report Module"    << endl;
+  cout << "4. Quit the program" << endl;
+}
+
+void Menu::displayFooter() {
+  cout << "\n" << setfill('=') << setw(W_SPACER) << "" << endl;
+  cout << setfill(' ');
+  cout << "De Anza CIS22B Winter 2015" << endl;
+  cout << "Alfred Ly | James Chantler | Dylan Lotivio" << endl;
+}
+
+
+
+
+
+
+
 
 // Cashier Menu Functions
-MenuCashier::MenuCashier() { }
-MenuCashier::~MenuCashier() { }
-
 void MenuCashier::displayHeader() {
+  system("cls");
   cout << "Serendipity Booksellers :: Cashier" << endl;
+  cout << setfill('=') << setw(W_SPACER) << "" << "\n\n";
+  cout << setfill(' ');
 }
 
 void MenuCashier::displayBody() {
-  cout << "Qty" << setw(9) << right << "ISBN" << setw(15) << right <<"Title" << setw(25) << right << "Price" << setw(15) << right << "Total" << endl;
-  cout << "________________________________________________________________"
+  // Display table header
+  cout  <<  setw(9) << right << "Qty"
+        << setw(15) << right << "ISBN"
+        << setw(25) << right << "Title"
+        << setw(15) << right << "Price"
+        << "Total" << endl;
+  //cout << "________________________________________________________________";
+
+  // Display table
   for (unsigned i = 0; i < Menu::m_tempList.size(); i++) {
-    cout << Menu::m_tempList[i]->getQuantity() << setw(9) << right << Menu::m_tempList[i]->getISBN()
-         << setw(15) << right << Menu::m_tempList[i]->getTItle() << setw(25) << right
-         << Menu::m_tempList[i]->getRetailPrice() << setw(15) << right
-         << Menu::m_tempList->getQuantity() * Menu::m_tempList->getRetailPrice() << endl;
+    cout <<  setw(9) << right << Menu::m_tempList[i]->getQuantity()    // Qty
+         << setw(15) << right << Menu::m_tempList[i]->getISBN()        // ISBN
+         << setw(25) << right << Menu::m_tempList[i]->getTitle()       // Title
+         << setw(15) << right << Menu::m_tempList[i]->getRetailPrice() // Price
+         << setw(15) << right << Menu::m_tempList[i]->getQuantity()    // Total
+                                 * Menu::m_tempList[i]->getRetailPrice();
     cout << setprecision(2) << fixed;
   }
 
-    cout << "Subtotal:" << setw(10) << right << m_cash.getSub();
-    cout << "Sales Tax:" << setw(10) << right << m_cash.getSalesTax();
-    cout << "Total:" << setw(10) << right << m_cash.getTotal();
+    cout << "Subtotal:"   << setw(30) << right << m_cash->getSubTotal() << endl;
+    cout << "Sales Tax:"  << setw(30) << right << m_cash->getSalesTax() << endl;
+    cout << "Total:"      << setw(30) << right <<
+      m_cash->getSubTotal() + m_cash->getSalesTax() << endl;
+
+    // Instructions
+    cout << "\n" << "1: Add a book" << endl;
+    cout << "2: Remove a book" << endl;
+    cout << "3: Finalize Transaction" << endl;
+    cout << "4: Return to Main Menu" << endl;
 }
 
-void MenuCashier::displayFooter(){
-  cout << "1: Add a book" << endl;
-  cout << "2: Remove a book" << endl;
-  cout << "3: Finalize Transaction" << endl;
-  cout << "Thank you for shopping at Serendipity Booksellers" << endl;
-}
+
+
+
+
+
 
 //Inventory Menu Functions
-MenuInventory::MenuInventory(){ }
-MenuInventory::~MenuInventory(){ }
-
-void MenuInventory::displayHeader(){
-  cout << "Serendipity Booksellers - Inventory Menu" << endl;
-
-void MenuInventory::displayBody(){
-  cout << "Look up a book" << endl;
-  cout << "Add a book" << endl;
-  cout << "Edit a book's record" << endl;
-  cout << "Delete a book" << endl;
-  cout << "Return to the Main Menu" << endl;
+void MenuInventory::displayHeader() {
+  system("cls");
+  cout << "Serendipity Booksellers :: Inventory Menu" << endl;
+  cout << setfill('=') << setw(W_SPACER) << "" << "\n\n";
+  cout << setfill(' ');
 }
 
-void MenuInventory::displayFooter(){
-  cout << "" << endl;
+void MenuInventory::displayBody() {
+  cout << "1. Look up a book" << endl;
+  cout << "2. Add a book" << endl;
+  cout << "3. Edit a book's record" << endl;
+  cout << "4. Delete a book" << endl;
+  cout << "5. Return to Main Menu" << endl;
 }
+
+
+
+
 
 
 //Report Menu Functions
-MenuReport::MenuReport();
-MenuReport::~MenuReport();
 void MenuReport::displayHeader(){
-  cout << "Serendipity Booksellers - Report Menu" << endl;
+  system("cls");
+  cout << "Serendipity Booksellers :: Report Menu" << endl;
+  cout << setfill('=') << setw(W_SPACER) << "" << "\n\n";
+  cout << setfill(' ');
 }
-void MenuReport::displayBody(){
+
+void MenuReport::displayBody() {
   cout << "1. Inventory Listing" << endl;
   cout << "2. Inventory Wholesale Value" << endl;
   cout << "3. Inventory Retail Value" << endl;
@@ -91,31 +143,38 @@ void MenuReport::displayBody(){
   cout << "6. Listing by Age" << endl;
   cout << "7. Return to Main Menu" << endl;
 }
-void MenuReport::displayFooter(){
-  cout << "Enter your Choice:" << endl;
-}
+
+
+
+
+
 
 //Book List Menu Functions
-MenuBookList::MenuBookList();
-MenuBookList::~MenuBookLIst();
 void MenuBookList::displayHeader(){
-  cout << "Serendipity Booksellers - Book Info Menu" << endl;
+  system("cls");
+  cout << "Serendipity Booksellers :: Book Info Menu" << endl;
+  cout << setfill('=') << setw(W_SPACER) << "" << "\n\n";
+  cout << setfill(' ');
 }
 
-void MenuBookList::displayBody(int first, int last){
-  vector<Book*> temp = Menu::m_tempList(
-    Menu::m_tempList.begin() + first, Menu::m_tempList.begin() + last);
-  cout << "ISBN:"
-  cout << "Title:"
-  cout << "Author:"
-  cout << "Publisher:"
-  cout << "Date Added:"
-  cout << "Quantity-On-Hand"
+void MenuBookList::displayBody() {
+  if(m_tempList.size() <= 0) {
+    cout << "\n\n\n" << setw(17) << right << "[No books to display]" << "\n\n\n";
+  }
+  // Display current book list
+  for(unsigned i = 0; i < m_tempList.size(); i++) {
+    cout << setprecision(2) << fixed;
+    cout << setw(17) << right << "ISBN"            << m_tempList[i]->getISBN()        << endl;
+    cout << setw(17) << right << "Title"           << m_tempList[i]->getTitle()       << endl;
+    cout << setw(17) << right << "Author"          << m_tempList[i]->getAuthor()      << endl;
+    cout << setw(17) << right << "Publisher"       << m_tempList[i]->getPublisher()   << endl;
+    cout << setw(17) << right << "Age"             << m_tempList[i]->getDateAdded().str() << endl;
+    cout << setw(17) << right << "Quantity"        << m_tempList[i]->getQuantity()    << endl;
+    cout << setw(17) << right << "Wholesale Value" << m_tempList[i]->getWholeCost()   << endl;
+    cout << setw(17) << right << "Retail Price"    << m_tempList[i]->getRetailPrice() << endl;
+  }
 }
 
-void MenuBookList::displayFooter(){
-
-}
 /*
 //void MainMenu::Menu1(int)
 //{
@@ -346,15 +405,3 @@ void MenuBookList::displayFooter(){
 //
 //void MainMenu::BuyBooks(double)
 //{}
-*/
-
-
-
-// Private methods
-void Menu::displayHeader() {
-  //cout << "Serendipity Bookstore POS" << endl;
-}
-
-void Menu::displayFooter() {
-  // Program footer
-}

@@ -11,29 +11,30 @@ using namespace std;
 
 
 class Menu {
-	static Inventory* m_inv;
-	static Cashier* m_cash;
-	static Report* m_report;
-
-	static vector<Book*> m_tempList;
-	static Book* 			   m_tempBook;
-
-	int state;
+protected:
+  static Inventory* m_inv;
+  static Cashier* m_cash;
+  static Report* m_report;
 
 public:
-	Menu(Inventory* inv, Cashier* cash);
-	virtual ~Menu();
+  // Static buffers
+  static vector<Book*>  m_tempList;
+  static vector<double> m_doubleList;
+  static Book*          m_tempBook;
+  static void Initialize(Inventory*, Cashier*, Report*);
+
+  virtual ~Menu();
 
   // Methods
-	virtual void displayHeader();
-	virtual void displayBody();
-	virtual void displayFooter();
+  virtual void displayHeader();
+  virtual void displayBody();
+  virtual void displayFooter();
 
-	// Mutators
-	void setState();
+  // Mutators
+  void setState();
 
-	// Accessors
-	void getState();
+  // Accessors
+  void getState();
 };
 
 
@@ -42,38 +43,28 @@ public:
 
 class MenuCashier : public Menu {
 public:
-	MenuCashier();
-	~MenuCashier();
-
-	void displayHeader();
-	void displayBody(int);			// Displays body based on state
-	void displayFooter();
+  void displayHeader();
+  void displayBody();      // Displays body based on state
+  //void displayFooter();
 };
 
 class MenuInventory : public Menu {
 public:
-	MenuInventory();
-	~MenuInventory();
-
-	void displayHeader();
-	void displayBody(int);			// Displays body based on state
-	void displayFooter();
+  void displayHeader();
+  void displayBody();
+  //void displayFooter();
 };
 
 class MenuReport : public Menu {
-	MenuReport();
-	~MenuReport();
-
-	void displayHeader();
-	void displayBody(int);			// Displays body based on state
-	void displayFooter();
+public:
+  void displayHeader();
+  void displayBody();      // Displays body based on state
+  //void displayFooter();
 };
 
 class MenuBookList : public Menu {
-	MenuBookList();
-	~MenuBookList();
-
-	void displayHeader();
-	void displayBody(int first, int last); // Displays based on range
-	void displayFooter();
-}
+public:
+  void displayHeader();
+  void displayBody();
+  //void displayFooter();
+};

@@ -2,11 +2,67 @@
 #include "pager.h"
 using namespace std;
 
+// Constructors
 Pager::Pager() :
   m_cursor(0), m_pageNumber(0), m_pageSize(1), m_numElements(0) {}
 
 Pager::Pager(unsigned page_size = 1) :
   m_cursor(0), m_pageNumber(0), m_pageSize(page_size), m_numElements(0) {}
+
+// Mutators
+void Pager::movePage(Pager::dir input) {
+  switch(input) {
+    case Pager::UP:
+      // Decrement page number, and stays >= 0
+      if(--m_pageNumber < 0) {
+        m_pageNumber = 0;
+      }
+      break;
+      // Increment page number, and stays within page limit
+    case Pager::DOWN:
+      if(++m_pageNumber * m_pageSize > m_numElements) {
+        m_pageNumber--;
+      }
+      break;
+  }
+}
+
+void Pager::moveCursor(Pager::dir input) {
+  // Cursor not implemented in this project
+  switch(input) {
+    case Pager::UP:
+      if(--m_cursor < 0) {
+        m_cursor = m_pageSize - 1;
+        movePage(Pager::UP);
+      }
+      break;
+  case Pager::DOWN:
+      if(++m_cursor >= m_pageSize) {
+        m_cursor = 0;
+        movePage(Pager::DOWN);
+      }
+      break;
+  case Pager::LEFT:
+      movePage(Pager::UP);
+      break;
+  case Pager::RIGHT:
+      movePage(Pager::DOWN);
+      break;
+  }
+}
+
+void Pager::setLength(int length) {
+  // Resize total number of items
+  m_cursor      = 0;
+  m_pageNumber  = 0;
+  m_pageSize    = m_pageSize;
+  m_numElements = length;
+}
+
+void Pager::setPageSize(int size) {
+  // Change number of items to display per page
+  m_pageSize = size;
+}
 
 // Accessors
 int Pager::getCursor()         { return m_cursor; }
@@ -24,48 +80,3 @@ int Pager::getAtCursor()       {
 }
 
 
-// Mutators
-void Pager::movePage(Pager::dir input) {
-  switch(input) {
-    case Pager::UP:
-      if(--m_pageNumber < 0) {
-        m_pageNumber = 0;
-      }
-      break;
-	case Pager::DOWN:
-      if(++m_pageNumber * m_pageSize > m_numElements) {
-        m_pageNumber--;
-      }
-      break;
-  }
-}
-
-void Pager::moveCursor(Pager::dir input) {
-  switch(input) {
-    case Pager::UP:
-      if(--m_cursor < 0) {
-        m_cursor = m_pageSize - 1;
-        movePage(Pager::UP);
-      }
-      break;
-	case Pager::DOWN:
-      if(++m_cursor >= m_pageSize) {
-        m_cursor = 0;
-        movePage(Pager::DOWN);
-      }
-      break;
-	case Pager::LEFT:
-      movePage(Pager::UP);
-      break;
-	case Pager::RIGHT:
-      movePage(Pager::DOWN);
-      break;
-  }
-}
-
-void Pager::setLength(int length) {
-  m_cursor      = 0;
-  m_pageNumber  = 0;
-  m_pageSize    = m_pageSize;
-  m_numElements = length;
-}
