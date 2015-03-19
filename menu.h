@@ -39,7 +39,8 @@ public:
 class MenuCashier : public Menu {
 public:
   void displayHeader();
-  void displayBody();      // Displays body based on state
+  void displayBody();  // Displays body based on state
+  void displayCart();
   //void displayFooter();
 };
 
