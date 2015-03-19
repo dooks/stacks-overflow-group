@@ -364,6 +364,9 @@ int main() {
         break;
 
       case 9: // case dance party
+      		system(PCLEAR);
+		  cout << "UNCE UNCE UNCE" << endl;
+		  state = prev_state;
         break;
 
       case 10: { // substates
