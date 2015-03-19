@@ -196,12 +196,12 @@ int main() {
               break;
             case 2: // case 2: list by wholesale price
               Menu::m_doubleList = report.getWholeList();
-              pager.setLength(Menu::m_activeList.size());
+              pager.setLength(Menu::m_doubleList.size());
               state = 6; // switch state to display book list(wholesale & total)
               break;
             case 3: // case 3: list by retail price
               Menu::m_doubleList = report.getRetailList();
-              pager.setLength(Menu::m_activeList.size());
+              pager.setLength(Menu::m_doubleList.size());
               state = 6; // switch state to display book list(retail & total)
               break;
             case 4: // case 4: list by quantity, desc
@@ -283,7 +283,7 @@ int main() {
           }
 
           if(!Menu::m_doubleList.empty()) {
-            pager.setLength(0);
+            pager.setLength(Menu::m_doubleList.size());
           } else {
             pager.setLength(Menu::m_activeList.size());
           }
@@ -293,12 +293,34 @@ int main() {
       }
 
       case 6: { // case display book list
+        // Derive page from current temp list
+        int first = pager.getPageFirst();
+        int  last = pager.getPageLast() + 1;
         vector<Book*> current_page;
 
         if(!Menu::m_doubleList.empty()) {
+          vector<double> double_page;
+
+          // Check array bounds to avoid subvector exception
+          try { Menu::m_doubleList.at(first); }
+          catch(...) { first = 0; }
+          try { Menu::m_doubleList.at(last); }
+          catch(...) { last = Menu::m_doubleList.size(); }
+
+          double_page.assign(
+            Menu::m_doubleList.begin() + first,
+            Menu::m_doubleList.begin() + last
+          );
+
           // Display total of vector instead
           menu_list.displayHeader();
-          cout << "Total: " << report.vecAdd(Menu::m_doubleList);
+          cout << setprecision(2) << fixed;
+          for(unsigned i = 0; i < double_page.size(); i++ ) {
+            cout << setw(3) << right << "$";
+            cout << setw(10) << right << double_page[i] << endl;
+          }
+
+          cout << endl << setw(10) << right << "Total: " << report.vecAdd(Menu::m_doubleList);
           menu_list.displayFooter((substate != 0), pager); // If substate
 
         } else {
