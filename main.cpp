@@ -10,6 +10,12 @@ using namespace std;
 
 #define PAGER_SIZE 10
 
+#ifdef __GNUC__
+  #define PCLEAR "clear"
+#else
+  #define PCLEAR "cls"
+#endif
+
 // Program states
 #define STATE_SPLASH    0
 #define STATE_MAIN      1
@@ -281,11 +287,19 @@ int main() {
         // display book list
         // Derive page from current temp list
         int first = pager.getPageFirst();
-        int  last = pager.getPageLast();
+        int  last = pager.getPageLast() + 1;
+
+        // Check array bounds to avoid subvector exception
+        try { Menu::m_tempList.at(first); }
+        catch(...) { first = 0; }
+        try { Menu::m_tempList.at(last); }
+        catch(...) { last = Menu::m_tempList.size(); }
+
         vector<Book*> current_page(
           Menu::m_tempList.begin() + first,
-          Menu::m_tempList.begin() + last + 1
+          Menu::m_tempList.begin() + last
         );
+
         menu_list.displayHeader();
         menu_list.displayBody(current_page);
         menu_list.displayFooter((substate != 0), pager); // If substate
@@ -364,9 +378,9 @@ int main() {
         break;
 
       case 9: // case dance party
-      		system(PCLEAR);
-		  cout << "UNCE UNCE UNCE" << endl;
-		  state = prev_state;
+        system(PCLEAR);
+        cout << "UNCE UNCE UNCE" << endl;
+        state = prev_state;
         break;
 
       case 10: { // substates
@@ -402,15 +416,15 @@ int main() {
               temp = input.getLine(); // TODO: validate input
               Menu::m_tempBook->setISBN(temp);
               break;
-            case 1: // case 2: author
+            case 1:// case 1: title
               temp = input.getLine(); // TODO: validate input
-              Menu::m_tempBook->setAuthor(temp);
-              break;
-            case 2:// case 3: title
-              temp = input.getLine();
               Menu::m_tempBook->setTitle(temp);
               break;
-            case 3: // case 4: publisher
+            case 2: // case 2: author
+              temp = input.getLine();
+              Menu::m_tempBook->setAuthor(temp);
+              break;
+            case 3: // case 3: publisher
               temp = input.getLine();
               Menu::m_tempBook->setPublisher(temp);
               break;
@@ -443,9 +457,11 @@ int main() {
               temp = input.getLine();
               Menu::m_tempBook->setRetailPrice(atof(temp.c_str()));
               break;
+            case 's':
             case 'S':
               inv.updBook(Menu::m_tempBook);
               // No break statement here, spills over to quit
+            case 'q': // TODO
             case 'Q': // TODO
               // Clear buffers
               Menu::m_tempList.clear();
@@ -466,13 +482,13 @@ int main() {
 
         if (substate == 5) { // checkout
           //menu_cash.displaycheckout(); 
-			menu_cash.displayHeader(); // display cashier menu
-			menu_cash.displayCart();
-			menu_cash.displayFooter();
-			system("pause");
-			cash.purchaseCart();
-			substate = 0;
-			state = 2;
+      menu_cash.displayHeader(); // display cashier menu
+      menu_cash.displayCart();
+      menu_cash.displayFooter();
+      system("pause");
+      cash.purchaseCart();
+      substate = 0;
+      state = 2;
         }
       break;
      }

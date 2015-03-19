@@ -72,12 +72,15 @@ int Pager::getPageCurrent()    { return m_pageNumber; }
 int Pager::getCursor()         { return m_cursor; }
 int Pager::getPageFirst()      { return m_pageNumber * m_pageSize; }
 int Pager::getPageLast()       {
-  // Return last item on page
+  if(m_numElements <= 0) return 0;
+
+  // Return last item on page regardless if exists
   int last = (m_pageNumber * m_pageSize) + m_pageSize;
 
   // Add in check if last item reached before end of page
-  return (last < m_numElements) ? last - 1 : m_numElements - 1;
+  return (last <= m_numElements) ? last - 1 : m_numElements - 1;
 }
+
 int Pager::getAtCursor()       {
   // Returns item number cursor is currently on
   return m_cursor + (m_pageNumber * m_pageSize);
