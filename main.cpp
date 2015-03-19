@@ -1,4 +1,5 @@
 #include <iostream>
+#include <windows.h>
 #include <cstdlib>
 using namespace std;
 
@@ -88,7 +89,7 @@ int main() {
     switch(state) {
       case 0: // case state splash screen
         cout << "Serendipity Booksellers POS" << endl;
-        cout << "Press any key to continue..." << endl;
+        cout << "Press enter to continue..." << endl;
         menu_main.displayFooter();
 
         input.getCh();  // wait for any key
@@ -131,8 +132,8 @@ int main() {
             substate   = 4; // switch substate to add cart
             break;
           case 2: // case 2: remove book
-            Menu::m_tempList = cash.getCart(); // Change active list to cart
-            pager.setLength(Menu::m_tempList.size());
+            Menu::m_activeList = cash.getCart(); // Change active list to cart
+            pager.setLength(Menu::m_activeList.size());
             state      = 6; // switch state to substate (only removing from cart)
             substate   = 2; // switch substate to delete book(cart)
             break;
@@ -186,40 +187,40 @@ int main() {
           prev_state = 4; // set previous state to report
           switch(input.getCh()) { //switch input
             case 1: // case 1: list all books
-              Menu::m_tempList = report.getAll();
-              pager.setLength(Menu::m_tempList.size());
+              Menu::m_activeList = report.getAll();
+              pager.setLength(Menu::m_activeList.size());
               state = 6; // switch state to display book list
               break;
             case 2: // case 2: list by wholesale price
               Menu::m_doubleList = report.getWholeList();
-              pager.setLength(Menu::m_tempList.size());
+              pager.setLength(Menu::m_activeList.size());
               state = 6; // switch state to display book list(wholesale & total)
               break;
             case 3: // case 3: list by retail price
               Menu::m_doubleList = report.getWholeList();
-              pager.setLength(Menu::m_tempList.size());
+              pager.setLength(Menu::m_activeList.size());
               state = 6; // switch state to display book list(retail & total)
               break;
             case 4: // case 4: list by quantity, desc
-              Menu::m_tempList = report.getSortQuantity(false);
-              pager.setLength(Menu::m_tempList.size());
+              Menu::m_activeList = report.getSortQuantity(false);
+              pager.setLength(Menu::m_activeList.size());
               state = 6; // switch state to display book list
               break;
             case 5: // case 5: list by cost, desc
-              Menu::m_tempList = report.getSortWhole(false);
-              pager.setLength(Menu::m_tempList.size());
+              Menu::m_activeList = report.getSortWhole(false);
+              pager.setLength(Menu::m_activeList.size());
               state = 6; // switch state to display book list
               break;
             case 6:  // case 6: list by age, desc
-              Menu::m_tempList = report.getSortAge(false);
-              pager.setLength(Menu::m_tempList.size());
+              Menu::m_activeList = report.getSortAge(false);
+              pager.setLength(Menu::m_activeList.size());
               state = 6; // switch state to display book list
               break;
-            case 7:   // case 7: return to previous menu
-              state = 1; // switch state to main menu
-              break;
-            case 8:  // case 8: DANCE PARTY
+            case 7:  // case 8: DANCE PARTY
               state = 9;
+              break;
+            case 8:   // case 7: return to previous menu
+              state = 1; // switch state to main menu
               break;
           }
           break;
@@ -235,49 +236,49 @@ int main() {
           switch(temp_input) { // prompt user select field to change
             case 1: // case 1: isbn
               temp = input.getLine();
-              Menu::m_tempList = inv.findBook(Book::ISBN, &temp);
+              Menu::m_activeList = inv.findBook(Book::ISBN, &temp);
               break;
             case 2: // case 2: author
               temp = input.getLine();
-              Menu::m_tempList = inv.findBook(Book::AUTHOR, &temp);
+              Menu::m_activeList = inv.findBook(Book::AUTHOR, &temp);
               break;
             case 3:// case 3: title
               temp = input.getLine();
-              Menu::m_tempList = inv.findBook(Book::TITLE, &temp);
+              Menu::m_activeList = inv.findBook(Book::TITLE, &temp);
               break;
             case 4: // case 4: publisher
               temp = input.getLine();
-              Menu::m_tempList = inv.findBook(Book::PUBLISHER, &temp);
+              Menu::m_activeList = inv.findBook(Book::PUBLISHER, &temp);
               break;
             case 5: // case 5: date added
               temp = input.getLine();
-              Menu::m_tempList = inv.findBook(Book::DATEADDED, &temp);
+              Menu::m_activeList = inv.findBook(Book::DATEADDED, &temp);
               break;
             case 6: { // case 6: wholesale price
               temp = input.getLine();
               double dtemp = atof(temp.c_str());
-              Menu::m_tempList = inv.findBook(Book::WHOLECOST, &dtemp);
+              Menu::m_activeList = inv.findBook(Book::WHOLECOST, &dtemp);
               break;
               }
             case 7: { // case 7: retail price
               temp = input.getLine();
               double dtemp = atof(temp.c_str());
-              Menu::m_tempList = inv.findBook(Book::RETAILPRICE, &dtemp);
+              Menu::m_activeList = inv.findBook(Book::RETAILPRICE, &dtemp);
               break;
               }
             case 8: { // case 8: quantity
               temp = input.getLine();
               int itemp = atoi(temp.c_str());
-              Menu::m_tempList = inv.findBook(Book::QUANTITY, &itemp);
+              Menu::m_activeList = inv.findBook(Book::QUANTITY, &itemp);
               break;
               }
             default:
               // TODO: If search fails, return all? or none
-              //Menu::m_tempList = inv.getRange(0, inv.getSize());
-              Menu::m_tempList.clear();
+              //Menu::m_activeList = inv.getRange(0, inv.getSize());
+              Menu::m_activeList.clear();
           }
 
-          pager.setLength(Menu::m_tempList.size());
+          pager.setLength(Menu::m_activeList.size());
           state = 6;// set state to display book list
 
           break;
@@ -290,14 +291,14 @@ int main() {
         int  last = pager.getPageLast() + 1;
 
         // Check array bounds to avoid subvector exception
-        try { Menu::m_tempList.at(first); }
+        try { Menu::m_activeList.at(first); }
         catch(...) { first = 0; }
-        try { Menu::m_tempList.at(last); }
-        catch(...) { last = Menu::m_tempList.size(); }
+        try { Menu::m_activeList.at(last); }
+        catch(...) { last = Menu::m_activeList.size(); }
 
         vector<Book*> current_page(
-          Menu::m_tempList.begin() + first,
-          Menu::m_tempList.begin() + last
+          Menu::m_activeList.begin() + first,
+          Menu::m_activeList.begin() + last
         );
 
         menu_list.displayHeader();
@@ -318,7 +319,7 @@ int main() {
           case 9: // case 1-10: user select given book
             // If substate is set, then we need to do more work
             if(substate != 0) {
-              Menu::m_tempBook = current_page[(unsigned) temp_input];
+              Menu::m_activeBook = current_page[(unsigned) temp_input];
               state = 10; // switch to substates
             }
             break;
@@ -333,9 +334,9 @@ int main() {
           case 'q':// case Q
           case 'Q':// case Q
             // Clear buffers
-            Menu::m_tempList.clear();
+            Menu::m_activeList.clear();
             Menu::m_doubleList.clear();
-            Menu::m_tempBook = NULL;
+            Menu::m_activeBook = NULL;
             state = prev_state;// go to previous state
         }
 
@@ -350,32 +351,32 @@ int main() {
         menu_inv.displayFooter();
 
         string temp;
-        Menu::m_tempBook = new Book;
+        Menu::m_activeBook = new Book;
         cout << "ISBN: "; getline(cin, temp);
-        Menu::m_tempBook->setISBN(temp);// prompt user for isbn
+        Menu::m_activeBook->setISBN(temp);// prompt user for isbn
         cout << "Title: "; getline(cin, temp);
-        Menu::m_tempBook->setTitle(temp);// prompt user for title
+        Menu::m_activeBook->setTitle(temp);// prompt user for title
         cout << "Author: "; getline(cin, temp);
-        Menu::m_tempBook->setAuthor(temp);// prompt user for author
+        Menu::m_activeBook->setAuthor(temp);// prompt user for author
         cout << "Publisher: "; getline(cin, temp);
-        Menu::m_tempBook->setPublisher(temp);// prompt user for publisher
+        Menu::m_activeBook->setPublisher(temp);// prompt user for publisher
         //cout << "Month Added: "; getline(cin, temp);
-        //Menu::m_tempBook->setMonth(stoi(temp));// prompt user for month added
+        //Menu::m_activeBook->setMonth(stoi(temp));// prompt user for month added
         //cout << "Day Added: "; getline(cin, temp);
-        //Menu::m_tempBook->setDay(stoi(temp));// prompt user for day added
+        //Menu::m_activeBook->setDay(stoi(temp));// prompt user for day added
         //cout << "Year Added: "; getline(cin, temp);
-        //Menu::m_tempBook->setYear(stoi(temp));// prompt user for year added
+        //Menu::m_activeBook->setYear(stoi(temp));// prompt user for year added
         cout << "Wholesale Cost: "; getline(cin, temp);
-        Menu::m_tempBook->setWholeCost(atof(temp.c_str()));// prompt user for wholesale price
+        Menu::m_activeBook->setWholeCost(atof(temp.c_str()));// prompt user for wholesale price
         cout << "Retail Price: "; getline(cin, temp);
-        Menu::m_tempBook->setRetailPrice(atoi(temp.c_str()));// prompt user for retail price
+        Menu::m_activeBook->setRetailPrice(atoi(temp.c_str()));// prompt user for retail price
 
-        inv.addBook(Menu::m_tempBook);
+        inv.addBook(Menu::m_activeBook);
 
         // Clear buffers
-        Menu::m_tempList.clear();
+        Menu::m_activeList.clear();
         Menu::m_doubleList.clear();
-        Menu::m_tempBook = NULL;
+        Menu::m_activeBook = NULL;
         state=prev_state;// return to last state
         break;
       }
@@ -386,33 +387,43 @@ int main() {
 
       case 9: // case dance party
         system(PCLEAR);
-        cout << "UNCE UNCE UNCE" << endl;
+        menu_main.displayHeader();
+        cout << "ARE YOU READY? Y/N?" << endl;
+        menu_main.displayFooter();
 
-        // Clear buffers
-        Menu::m_tempList.clear();
-        Menu::m_doubleList.clear();
-        Menu::m_tempBook = NULL;
-        state = prev_state;
+        switch(input.getCh()) {
+          case 'y':
+          case 'Y':
+            ShellExecute(NULL, "open", "http://corgiorgy.com", NULL, NULL, SW_SHOWNORMAL);
+          case 'n':
+          case 'N':
+            // Clear buffers
+            Menu::m_activeList.clear();
+            Menu::m_doubleList.clear();
+            Menu::m_activeBook = NULL;
+            state = prev_state;
+        }
+
         break;
 
       case 10: { // substates
         if (substate == 1) {  // substate delete book
-          inv.delBook(Menu::m_tempBook);
+          inv.delBook(Menu::m_activeBook);
 
           // Clear buffers
-          Menu::m_tempList.clear();
+          Menu::m_activeList.clear();
           Menu::m_doubleList.clear();
-          Menu::m_tempBook = NULL;
+          Menu::m_activeBook = NULL;
           state = prev_state;
         }
 
         if (substate == 2) {  // substate remove from cart
-          cash.delCart(Menu::m_tempBook);
+          cash.delCart(Menu::m_activeBook);
 
           // Clear buffers
-          Menu::m_tempList.clear();
+          Menu::m_activeList.clear();
           Menu::m_doubleList.clear();
-          Menu::m_tempBook = NULL;
+          Menu::m_activeBook = NULL;
           state = prev_state;
         }
 
@@ -428,19 +439,19 @@ int main() {
           switch(temp_input) { // prompt user select field to change
             case 0: // case 1: isbn
               temp = input.getLine(); // TODO: validate input
-              Menu::m_tempBook->setISBN(temp);
+              Menu::m_activeBook->setISBN(temp);
               break;
             case 1:// case 1: title
               temp = input.getLine(); // TODO: validate input
-              Menu::m_tempBook->setTitle(temp);
+              Menu::m_activeBook->setTitle(temp);
               break;
             case 2: // case 2: author
               temp = input.getLine();
-              Menu::m_tempBook->setAuthor(temp);
+              Menu::m_activeBook->setAuthor(temp);
               break;
             case 3: // case 3: publisher
               temp = input.getLine();
-              Menu::m_tempBook->setPublisher(temp);
+              Menu::m_activeBook->setPublisher(temp);
               break;
             case 4: { // case 5: date added
               date dtemp;
@@ -456,43 +467,43 @@ int main() {
               cout << "Year: ";
               temp = input.getLine();
               dtemp.setYear(atoi(temp.c_str()));
-              Menu::m_tempBook->setDateAdded(dtemp);
+              Menu::m_activeBook->setDateAdded(dtemp);
               break;
               }
             case 5: // case 8: quantity
               temp = input.getLine();
-              Menu::m_tempBook->setQuantity(atoi(temp.c_str()));
+              Menu::m_activeBook->setQuantity(atoi(temp.c_str()));
               break;
             case 6: // case 6: wholesale price
               temp = input.getLine();
-              Menu::m_tempBook->setWholeCost(atof(temp.c_str()));
+              Menu::m_activeBook->setWholeCost(atof(temp.c_str()));
               break;
             case 7: // case 7: retail price
               temp = input.getLine();
-              Menu::m_tempBook->setRetailPrice(atof(temp.c_str()));
+              Menu::m_activeBook->setRetailPrice(atof(temp.c_str()));
               break;
             case 's':
             case 'S':
-              inv.updBook(Menu::m_tempBook);
+              inv.updBook(Menu::m_activeBook);
               // No break statement here, spills over to quit
             case 'q': // TODO
             case 'Q': // TODO
               // Clear buffers
-              Menu::m_tempList.clear();
+              Menu::m_activeList.clear();
               Menu::m_doubleList.clear();
-              Menu::m_tempBook = NULL;
+              Menu::m_activeBook = NULL;
               state = prev_state;
               break;
           }
         }
 
         if (substate == 4)  { // substate add to cart
-            cash.addCart(Menu::m_tempBook); // add to cart
+            cash.addCart(Menu::m_activeBook); // add to cart
 
             // Clear buffers
-            Menu::m_tempList.clear();
+            Menu::m_activeList.clear();
             Menu::m_doubleList.clear();
-            Menu::m_tempBook = NULL;
+            Menu::m_activeBook = NULL;
             state = prev_state;
         }
 

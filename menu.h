@@ -19,9 +19,9 @@ protected:
 
 public:
   // Static buffers
-  static vector<Book*>  m_tempList;
+  static vector<Book*>  m_activeList;
   static vector<double> m_doubleList;
-  static Book*          m_tempBook;
+  static Book*          m_activeBook;
   static void Initialize(Inventory*, Cashier*, Report*);
 
   virtual ~Menu();

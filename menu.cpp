@@ -25,9 +25,9 @@ Cashier* Menu::m_cash  = NULL;
 Report* Menu::m_report = NULL;
 
 // Static buffers
-vector<Book*> Menu::m_tempList;
+vector<Book*> Menu::m_activeList;
 vector<double> Menu::m_doubleList;
-Book*     Menu::m_tempBook;
+Book*     Menu::m_activeBook;
 
 Menu::~Menu() { /* No garbage collection necessary */ }
 
@@ -191,7 +191,8 @@ void MenuReport::displayBody() {
   cout << "4. Listing by Quantity" << endl;
   cout << "5. Listing by Cost" << endl;
   cout << "6. Listing by Age" << endl;
-  cout << "7. Return to Main Menu" << endl;
+  cout << "7. DANCE PARTY" << endl;
+  cout << "8. Return to Main Menu" << endl;
 }
 
 
@@ -237,21 +238,21 @@ void MenuBookList::displayBody(vector<Book*>& current_page) {
     cout << setprecision(2) << fixed;
 
     cout << setw(3) << right << "[" << i << "]";
-    cout << setw(5) << right << "Title: "
+    cout << setw(6) << right << "Title: "
          << setw(50) << left << current_page[i]->getTitle();
     cout << endl;
 
-    cout << setw(10) << right << "ISBN: "
+    cout << setw(11) << right << "ISBN: "
          << setw(15) << left << current_page[i]->getISBN();
     cout << endl;
 
-    cout << setw(10) << right << "Author: "
+    cout << setw(11) << right << "Author: "
          << setw(15) << left << current_page[i]->getAuthor();
     cout << setw(15) << right << "Publisher: "
          << setw(25) << left << current_page[i]->getPublisher();
     cout << endl;
 
-    cout << setw(10) << right << "Age: "
+    cout << setw(11) << right << "Age: "
          << setw(15) << left << current_page[i]->getDateAdded().str();
     cout << setw(15) << right << "Quantity: "
          << setw(5) << left << current_page[i]->getQuantity();
@@ -289,21 +290,21 @@ void MenuEdit::displayBody() {
   // Display current book with field numbers
 
   cout << setw(20) << right << "[0] ISBN: "
-       << setw(50) << left << Menu::m_tempBook->getISBN() << endl;
+       << setw(50) << left << Menu::m_activeBook->getISBN() << endl;
   cout << setw(20) << right << "[1] Title: "
-       << setw(50) << left << Menu::m_tempBook->getTitle() << endl;
+       << setw(50) << left << Menu::m_activeBook->getTitle() << endl;
   cout << setw(20) << right << "[2] Author: "
-       << setw(50) << left << Menu::m_tempBook->getAuthor() << endl;
+       << setw(50) << left << Menu::m_activeBook->getAuthor() << endl;
   cout << setw(20) << right << "[3] Publisher: "
-       << setw(50) << left << Menu::m_tempBook->getPublisher() << endl;
+       << setw(50) << left << Menu::m_activeBook->getPublisher() << endl;
   cout << setw(20) << right << "[4] Age: "
-       << setw(50) << left << Menu::m_tempBook->getDateAdded().str() << endl;
+       << setw(50) << left << Menu::m_activeBook->getDateAdded().str() << endl;
   cout << setw(20) << right << "[5] Quantity: "
-       << setw(50) << left << Menu::m_tempBook->getQuantity() << endl;
+       << setw(50) << left << Menu::m_activeBook->getQuantity() << endl;
   cout << setw(20) << right << "[6] Wholesale Cost: "
-       << setw(50) << left << Menu::m_tempBook->getWholeCost() << endl;
+       << setw(50) << left << Menu::m_activeBook->getWholeCost() << endl;
   cout << setw(20) << right << "[7] Retail Price: "
-       << setw(50) << left << Menu::m_tempBook->getRetailPrice() << endl;
+       << setw(50) << left << Menu::m_activeBook->getRetailPrice() << endl;
 }
 
 void MenuEdit::displayFooter() { // If substate, show options to select book
