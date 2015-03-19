@@ -131,7 +131,7 @@ int main() {
             substate   = 2; // switch substate to delete book(cart)
             break;
           case 3: // case 3: finalize transaction
-            //state      = 6; // switch state to display book list
+            state      = 10; // switch state to display book list
             substate   = 5; // switch substate to checkout
             break;
           case 4: // case 4: return to main menu
@@ -462,7 +462,14 @@ int main() {
         }
 
         if (substate == 5) { // checkout
-          //menu_cash.displaycheckout(); // TODO <--- ?
+          //menu_cash.displaycheckout(); 
+			menu_cash.displayHeader(); // display cashier menu
+			menu_cash.displayCart();
+			menu_cash.displayFooter();
+			system("pause");
+			cash.purchaseCart();
+			substate = 0;
+			state = 2;
         }
       break;
      }
