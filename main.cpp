@@ -332,6 +332,10 @@ int main() {
             break;// go to previous page
           case 'q':// case Q
           case 'Q':// case Q
+            // Clear buffers
+            Menu::m_tempList.clear();
+            Menu::m_doubleList.clear();
+            Menu::m_tempBook = NULL;
             state = prev_state;// go to previous state
         }
 
@@ -367,8 +371,11 @@ int main() {
         Menu::m_tempBook->setRetailPrice(atoi(temp.c_str()));// prompt user for retail price
 
         inv.addBook(Menu::m_tempBook);
-        Menu::m_tempBook = NULL;
 
+        // Clear buffers
+        Menu::m_tempList.clear();
+        Menu::m_doubleList.clear();
+        Menu::m_tempBook = NULL;
         state=prev_state;// return to last state
         break;
       }
@@ -380,6 +387,11 @@ int main() {
       case 9: // case dance party
         system(PCLEAR);
         cout << "UNCE UNCE UNCE" << endl;
+
+        // Clear buffers
+        Menu::m_tempList.clear();
+        Menu::m_doubleList.clear();
+        Menu::m_tempBook = NULL;
         state = prev_state;
         break;
 
@@ -389,6 +401,7 @@ int main() {
 
           // Clear buffers
           Menu::m_tempList.clear();
+          Menu::m_doubleList.clear();
           Menu::m_tempBook = NULL;
           state = prev_state;
         }
@@ -398,6 +411,7 @@ int main() {
 
           // Clear buffers
           Menu::m_tempList.clear();
+          Menu::m_doubleList.clear();
           Menu::m_tempBook = NULL;
           state = prev_state;
         }
@@ -465,6 +479,7 @@ int main() {
             case 'Q': // TODO
               // Clear buffers
               Menu::m_tempList.clear();
+              Menu::m_doubleList.clear();
               Menu::m_tempBook = NULL;
               state = prev_state;
               break;
@@ -476,6 +491,7 @@ int main() {
 
             // Clear buffers
             Menu::m_tempList.clear();
+            Menu::m_doubleList.clear();
             Menu::m_tempBook = NULL;
             state = prev_state;
         }
