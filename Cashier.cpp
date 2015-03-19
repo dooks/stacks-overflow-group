@@ -6,6 +6,8 @@
 #include "inventory.h"
 #include "book.h"
 
+#define SALES_TAX 0.0875
+
 Cashier::Cashier(Inventory* minv) {
   inv = minv;
 }
@@ -51,18 +53,23 @@ bool Cashier::addCart(Book* book) {
 
   // Check if book is in cart
   for(unsigned i = 0; i < m_cartlist.size(); i++) {
-    if(m_cartlist[i] == book) {
+    // Compare file index instead of pointer because they will be different!
+    if(m_cartlist[i]->getFileIndex() == book->getFileIndex()) {
       // If book exists in cart
       // Change increment quantity instead
-      m_cartlist[i]->setQuantity( m_cartlist[i]->getQuantity() + 1 );
-
+      int quantity = m_cartlist[i]->getQuantity();
+      m_cartlist[i]->setQuantity(quantity + 1);
       // return function
       return true;
     }
   }
 
-  //
-  m_cartlist.push_back(book);
+  // Book does not exist in cart
+  // Create new copy of book and set quantity to 1
+  Book* cart_book = new Book;
+  *cart_book = *book; // Copy
+  cart_book->setQuantity(1);
+  m_cartlist.push_back(cart_book);
   return true;
 }
 
@@ -74,19 +81,33 @@ bool Cashier::delCart(Book* book) {
   */
   for (unsigned i = 0; i < m_cartlist.size(); i++)
   {
-    if (book == m_cartlist[i]) {
-      // Erases element from m_cartlist
-      m_cartlist.erase((m_cartlist.begin() + i));
+    if(m_cartlist[i]->getFileIndex() == book->getFileIndex()) {
+      int quantity = m_cartlist[i]->getQuantity();
+      if(quantity > 1) {
+        m_cartlist[i]->setQuantity(quantity - 1);
+        return true;
+      } else {
+        // Delete element
+        delete m_cartlist[i];
+        // Erases element from m_cartlist
+        m_cartlist.erase((m_cartlist.begin() + i));
+        return true;
+      }
     }
   }
-  return true;
+  // No book found
+  return false;
 }
 
 bool Cashier::clearCart() {
-  /*
-  Clear whole cart
-  */
+  for(unsigned i = 0; i < m_cartlist.size(); i++) {
+    // delete all elements
+    delete m_cartlist[i];
+  }
+
+  // Clear vector
   m_cartlist.clear();
+
   return true;
 }
 
@@ -122,8 +143,7 @@ double Cashier::getSalesTax(){
   /*
   Returns sales tax
   */
-  double salestax = 0.0875; // TODO: change this to global #define
-  double retval = getSubTotal() * salestax;
+  double retval = getSubTotal() * SALES_TAX;
   return retval;
 }
 
@@ -135,7 +155,7 @@ double Cashier::getSubTotal(){
   double subtotal = 0;
   for (unsigned i = 0; i < m_cartlist.size(); i++) {
     // If book matches item in list, this item's subtotal is added
-    subtotal += m_cartlist[i]->getRetailPrice();
+    subtotal += m_cartlist[i]->getRetailPrice() * m_cartlist[i]->getQuantity();
   }
   return subtotal;
 }

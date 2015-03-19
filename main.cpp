@@ -170,7 +170,6 @@ int main() {
             substate   = 1; // switch substate to delete book
             break;
           case 5: // case 5: sync changes
-            //state      = 1; // switch state to main menu
             //inv.sync();
             break;
           case 6: // case 5: return to previous menu
