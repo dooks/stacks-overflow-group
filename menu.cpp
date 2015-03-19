@@ -108,6 +108,37 @@ void MenuCashier::displayBody() {
   cout << "3: Finalize Transaction" << endl;
   cout << "4: Return to Main Menu" << endl;
 }
+void MenuCashier::displayCart() {
+	vector<Book*> cart = m_cash->getCart();
+
+	// If there is an item in the cart, display the cart
+	if (cart.size() > 0) {
+		cout << "Thank you for shopping with Serendipity Booksellers!" << endl;
+		// Display table header
+		cout << setw(4) << right << " Qty"
+			<< setw(7) << right << "Price"
+			<< setw(2) << ""
+			<< setw(100) << left << "Title" << endl;
+
+		// Display table
+		for (unsigned i = 0; i < cart.size(); i++) {
+			cout << setw(4) << right << cart[i]->getQuantity()    // Qty
+				<< setw(7) << right << cart[i]->getRetailPrice() // Price
+				<< setw(2) << ""
+				<< setw(50) << left << cart[i]->getTitle();       // Title
+			cout << endl;
+		}
+
+		cout << setprecision(2) << fixed;
+		cout << setfill('=') << setw(30) << "" << setfill(' ') << endl;
+		cout << setw(20) << right << "Subtotal: " << m_cash->getSubTotal() << endl;
+		cout << setw(20) << right << "Sales Tax: " << m_cash->getSalesTax() << endl;
+		cout << setw(20) << right << "Total: "
+			<< m_cash->getSubTotal() + m_cash->getSalesTax() << endl;
+	}
+
+
+}
 
 
 
