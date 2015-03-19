@@ -3,6 +3,7 @@
 #include <cstdlib>
 using namespace std;
 
+#include "tools/build-db.h"
 #include "menu.h"
 #include "Cashier.h"
 #include "inventory.h"
