@@ -200,7 +200,7 @@ int main() {
               state = 6; // switch state to display book list(wholesale & total)
               break;
             case 3: // case 3: list by retail price
-              Menu::m_doubleList = report.getWholeList();
+              Menu::m_doubleList = report.getRetailList();
               pager.setLength(Menu::m_activeList.size());
               state = 6; // switch state to display book list(retail & total)
               break;
@@ -279,34 +279,50 @@ int main() {
               // TODO: If search fails, return all? or none
               //Menu::m_activeList = inv.getRange(0, inv.getSize());
               Menu::m_activeList.clear();
+              Menu::m_doubleList.clear();
           }
 
-          pager.setLength(Menu::m_activeList.size());
+          if(!Menu::m_doubleList.empty()) {
+            pager.setLength(0);
+          } else {
+            pager.setLength(Menu::m_activeList.size());
+          }
           state = 6;// set state to display book list
 
           break;
       }
 
       case 6: { // case display book list
-        // display book list
-        // Derive page from current temp list
-        int first = pager.getPageFirst();
-        int  last = pager.getPageLast() + 1;
+        vector<Book*> current_page;
 
-        // Check array bounds to avoid subvector exception
-        try { Menu::m_activeList.at(first); }
-        catch(...) { first = 0; }
-        try { Menu::m_activeList.at(last); }
-        catch(...) { last = Menu::m_activeList.size(); }
+        if(!Menu::m_doubleList.empty()) {
+          // Display total of vector instead
+          menu_list.displayHeader();
+          cout << "Total: " << report.vecAdd(Menu::m_doubleList);
+          menu_list.displayFooter((substate != 0), pager); // If substate
 
-        vector<Book*> current_page(
-          Menu::m_activeList.begin() + first,
-          Menu::m_activeList.begin() + last
-        );
+        } else {
+          // display book list
+          // Derive page from current temp list
+          int first = pager.getPageFirst();
+          int  last = pager.getPageLast() + 1;
 
-        menu_list.displayHeader();
-        menu_list.displayBody(current_page);
-        menu_list.displayFooter((substate != 0), pager); // If substate
+          // Check array bounds to avoid subvector exception
+          try { Menu::m_activeList.at(first); }
+          catch(...) { first = 0; }
+          try { Menu::m_activeList.at(last); }
+          catch(...) { last = Menu::m_activeList.size(); }
+
+          current_page.assign(
+            Menu::m_activeList.begin() + first,
+            Menu::m_activeList.begin() + last
+          );
+
+          menu_list.displayHeader();
+          menu_list.displayBody(current_page);
+          menu_list.displayFooter((substate != 0), pager); // If substate
+        }
+
         char temp_input = input.getCh();
 
         switch(temp_input) {// switch user input

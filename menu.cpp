@@ -239,7 +239,7 @@ void MenuBookList::displayBody(vector<Book*>& current_page) {
     cout << setprecision(2) << fixed;
 
     cout << setw(3) << right << "[" << i << "]";
-    cout << setw(6) << right << "Title: "
+    cout << setw(6) << right << " Title: "
          << setw(50) << left << current_page[i]->getTitle();
     cout << endl;
 
