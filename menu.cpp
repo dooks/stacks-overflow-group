@@ -136,7 +136,10 @@ void MenuCashier::displayCart() {
 		cout << setw(20) << right << "Total: "
 			<< m_cash->getSubTotal() + m_cash->getSalesTax() << endl;
 	}
-
+	else
+	{
+		cout << "The cart was empty."< endl;
+	}
 
 }
 
