@@ -47,6 +47,7 @@ public:
   void displayHeader();
   void displayBody();
   //void displayFooter();
+  void displaySearchPrompt();
 };
 
 class MenuReport : public Menu {
@@ -59,6 +60,6 @@ public:
 class MenuBookList : public Menu {
 public:
   void displayHeader();
-  void displayBody();
+  void displayBody(vector<Book*>&); // Accepts a page to list
   //void displayFooter();
 };

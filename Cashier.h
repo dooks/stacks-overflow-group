@@ -22,4 +22,5 @@ public:
   bool purchaseCart();
   double getSalesTax();
   double getSubTotal();
+
 };

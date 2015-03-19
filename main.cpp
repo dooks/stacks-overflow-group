@@ -46,7 +46,7 @@ int main() {
   Menu menu_main;
   MenuCashier menu_cash;
   MenuInventory menu_inv;
-  //MenuBookList menu_list;
+  MenuBookList menu_list;
   MenuReport menu_report;
 
 
@@ -61,6 +61,7 @@ int main() {
                     // 7 - add book
                     // 8 - quit
                     // 9 - dance
+                    // 10 - substate
   int prev_state = 0;
 
   int substate = 0; // 0 - none
@@ -111,7 +112,8 @@ int main() {
         break;
 
       case 2: // case state cashier module
-        Menu::m_tempList = cash.getCart(); // Set temp list to cart
+        vector<Book*> = cash.getCart(); // Set temp list to cart
+        
         menu_cash.displayHeader(); // display cashier menu
         menu_cash.displayBody();
         menu_cash.displayFooter();
@@ -213,8 +215,9 @@ int main() {
       case 5: { // case state book search
           //menu_search.displayBody();    // display search body
           //menu_search.displayPrompt();  // prompt user for which field to search fo
-
+          void Menu_inv.displaySearchPrompt();
           string temp;
+
           switch(input.getCh()) { // prompt user select field to change
             case 1: // case 1: isbn
               temp = input.getLine();
@@ -266,7 +269,14 @@ int main() {
 
       case 6: { // case display book list
         // display book list
-        // book list is Menu::m_tempList
+        // Derive page from current temp list
+        vector<Book*> current_page(
+          Menu::m_tempList.begin() + pager.getPageFirst(),
+          Menu::m_tempList.begin() + pager.getPageLast()
+        );
+        menu_list.displayHeader();
+        menu_list.displayBody(current_page);
+        menu_list.displayFooter();
         char temp_input = input.getCh();
 
         switch(temp_input) {// switch user input
@@ -280,28 +290,75 @@ int main() {
           case 8:
           case 9:
           case 10: // case 1-10: user select given book
-            Menu::m_tempBook = Menu::m_tempList[(unsigned) temp_input - 1];
-            state = prev_state;// switch to last state
+            Menu::m_tempBook = current_page[(unsigned) temp_input - 1];
+            state = 10; // switch to last state
             break;
           case 'n':// case N
           case 'N':// case N
-            //pager.movePage();
+            pager.movePage(Pager::DOWN);
             break;// go to next page
           case 'p':// case P
           case 'P':// case P
-            //pager.movePage(up);
+            pager.movePage(Pager::UP);
             break;// go to previous page
           case 'q':// case Q
           case 'Q':// case Q
             state = prev_state;// go to previous state
         }
 
+
+      case 7: { // case state add book
+        menu_inv.displayHeader();// create new menu temp book and prompt user for:
+        menu_inv.displayBody();// create new menu temp book and prompt user for:
+        menu_inv.displayFooter();// create new menu temp book and prompt user for:
+
+        string temp;
+        Menu::m_tempBook = new Book;
+        cout << "ISBN: "; getline(cin, temp);
+        Menu::m_tempBook->setISBN(temp);// prompt user for isbn
+        cout << "Title: "; getline(cin, temp);
+        Menu::m_tempBook->setTitle(temp);// prompt user for title
+        cout << "Author: "; getline(cin, temp);
+        Menu::m_tempBook->setAuthor(temp);// prompt user for author
+        cout << "Publisher: "; getline(cin, temp);
+        Menu::m_tempBook->setPublisher(temp);// prompt user for publisher
+        //cout << "Month Added: "; getline(cin, temp);
+        //Menu::m_tempBook->setMonth(stoi(temp));// prompt user for month added
+        //cout << "Day Added: "; getline(cin, temp);
+        //Menu::m_tempBook->setDay(stoi(temp));// prompt user for day added
+        //cout << "Year Added: "; getline(cin, temp);
+        //Menu::m_tempBook->setYear(stoi(temp));// prompt user for year added
+        cout << "Wholesale Cost: "; getline(cin, temp);
+        Menu::m_tempBook->setWholeCost(atof(temp.c_str()));// prompt user for wholesale price
+        cout << "Retail Price: "; getline(cin, temp);
+        Menu::m_tempBook->setRetailPrice(atoi(temp.c_str()));// prompt user for retail price
+
+        inv.addBook(Menu::m_tempBook);
+        Menu::m_tempBook = NULL;
+
+        state=prev_state;// return to last state
+        break;
+
+        }
+      case 8: // case quit
+        quit = true; // set quit to true
+        break;
+        
+      case 10: // substates
         if (substate == 1) {  // substate delete book
-            inv.delBook(Menu::m_tempBook);    //switch state to delete book
-            state = prev_state;
+          inv.delBook(Menu::m_tempBook);
+
+          // Clear buffers
+          Menu::m_tempList.clear();
+          Menu::m_tempBook = NULL;
+          state = prev_state;
           }
         if (substate == 2) {  // substate remove from cart
           cash.delCart(Menu::m_tempBook);
+
+          // Clear buffers
+          Menu::m_tempList.clear();
+          Menu::m_tempBook = NULL;
           state = prev_state;
         }
 
@@ -365,48 +422,12 @@ int main() {
 
         if (substate == 5) // checkout
         {
-          //menu_cash.displaycheckout(); // TODO <--- ?
+          menu_cash.displaycheckout();//menu_cash.displaycheckout(); // TODO <--- ?
         }
 
         substate=0; // Clear substate
         break;
         }
-
-      case 7: { // case state add book
-        menu_inv.displayHeader();// create new menu temp book and prompt user for:
-        menu_inv.displayBody();// create new menu temp book and prompt user for:
-        menu_inv.displayFooter();// create new menu temp book and prompt user for:
-
-        string temp;
-        Menu::m_tempBook = new Book;
-        cout << "ISBN: "; getline(cin, temp);
-        Menu::m_tempBook->setISBN(temp);// prompt user for isbn
-        cout << "Title: "; getline(cin, temp);
-        Menu::m_tempBook->setTitle(temp);// prompt user for title
-        cout << "Author: "; getline(cin, temp);
-        Menu::m_tempBook->setAuthor(temp);// prompt user for author
-        cout << "Publisher: "; getline(cin, temp);
-        Menu::m_tempBook->setPublisher(temp);// prompt user for publisher
-        //cout << "Month Added: "; getline(cin, temp);
-        //Menu::m_tempBook->setMonth(stoi(temp));// prompt user for month added
-        //cout << "Day Added: "; getline(cin, temp);
-        //Menu::m_tempBook->setDay(stoi(temp));// prompt user for day added
-        //cout << "Year Added: "; getline(cin, temp);
-        //Menu::m_tempBook->setYear(stoi(temp));// prompt user for year added
-        cout << "Wholesale Cost: "; getline(cin, temp);
-        Menu::m_tempBook->setWholeCost(atof(temp.c_str()));// prompt user for wholesale price
-        cout << "Retail Price: "; getline(cin, temp);
-        Menu::m_tempBook->setRetailPrice(atoi(temp.c_str()));// prompt user for retail price
-
-        inv.addBook(Menu::m_tempBook);
-        Menu::m_tempBook = NULL;
-
-        state=prev_state;// return to last state
-        break;
-
-        }
-      case 8: // case quit
-        quit = true; // set quit to true
     }
   }
 
