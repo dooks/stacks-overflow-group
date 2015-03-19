@@ -14,15 +14,11 @@ void Pager::movePage(Pager::dir input) {
   switch(input) {
     case Pager::UP:
       // Decrement page number, and stays >= 0
-      if(--m_pageNumber < 0) {
-        m_pageNumber = 0;
-      }
+      if(--m_pageNumber < 0) m_pageNumber = 0;
       break;
-      // Increment page number, and stays within page limit
     case Pager::DOWN:
-      if(++m_pageNumber * m_pageSize > m_numElements) {
-        m_pageNumber--;
-      }
+      // Increment page number, and stays within page limit
+      if(++m_pageNumber > getPageTotal() - 1) m_pageNumber--;
       break;
   }
 }
@@ -59,18 +55,27 @@ void Pager::setLength(int length) {
   m_numElements = length;
 }
 
+
 void Pager::setPageSize(int size) {
   // Change number of items to display per page
   m_pageSize = size;
 }
 
 // Accessors
+int Pager::getPageTotal() {
+  // Return total number of pages possible
+  // First, round down to multiple of m_pageSize
+  // Divide the whole thing by page size, then add 1
+  return (m_numElements - (m_numElements % m_pageSize)) / m_pageSize + 1;
+}
+
+int Pager::getPageCurrent()    { return m_pageNumber; }
 int Pager::getCursor()         { return m_cursor; }
-int Pager::getPageNumber()     { return m_pageNumber; }
 int Pager::getPageFirst()      { return m_pageNumber * m_pageSize; }
 int Pager::getPageLast()       {
   // Return last item on page
   int last = (m_pageNumber * m_pageSize) + m_pageSize;
+
   // Add in check if last item reached before end of page
   return (last < m_numElements) ? last : m_numElements - 1;
 }

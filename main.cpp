@@ -43,11 +43,13 @@ int main() {
 
   // Menu modules
   Menu::Initialize(&inv, &cash, &report);
-  Menu menu_main;
-  MenuCashier menu_cash;
+  Menu         menu_main;
+  MenuCashier  menu_cash;
   MenuInventory menu_inv;
-  MenuBookList menu_list;
   MenuReport menu_report;
+  MenuSearch menu_search;
+  MenuBookList menu_list;
+  MenuEdit     menu_edit;
 
 
   // Main globals
@@ -123,7 +125,8 @@ int main() {
             substate   = 4; // switch substate to add cart
             break;
           case 2: // case 2: remove book
-            state      = 5; // switch state to search
+            Menu::m_tempList = cash.getCart(); // Change active list to cart
+            state      = 6; // switch state to substate (only removing from cart)
             substate   = 2; // switch substate to delete book(cart)
             break;
           case 3: // case 3: finalize transaction
@@ -158,7 +161,11 @@ int main() {
             state      = 5; // switch state to search
             substate   = 1; // switch substate to delete book
             break;
-          case 5: // case 5: return to previous menu
+          case 5: // case 5: sync changes
+            //state      = 1; // switch state to main menu
+            //inv.sync();
+            break;
+          case 6: // case 5: return to previous menu
             state      = 1; // switch state to main menu
             break;
         }
@@ -211,12 +218,14 @@ int main() {
           break;
 
       case 5: { // case state book search
-          //menu_search.displayBody();    // display search body
-          //menu_search.displayPrompt();  // prompt user for which field to search fo
-          string temp;
-          menudi
+          menu_search.displayHeader();    // display search body
+          menu_search.displayBody();    // display search body
+          menu_search.displayFooter();    // display search body
+          char temp_input = input.getCh();
+          cout << "Enter search term: ";
 
-          switch(input.getCh()) { // prompt user select field to change
+          string temp;
+          switch(temp_input) { // prompt user select field to change
             case 1: // case 1: isbn
               temp = input.getLine();
               Menu::m_tempList = inv.findBook(Book::ISBN, &temp);
@@ -224,6 +233,7 @@ int main() {
             case 2: // case 2: author
               temp = input.getLine();
               Menu::m_tempList = inv.findBook(Book::AUTHOR, &temp);
+              break;
             case 3:// case 3: title
               temp = input.getLine();
               Menu::m_tempList = inv.findBook(Book::TITLE, &temp);
@@ -256,7 +266,8 @@ int main() {
               }
             default:
               // TODO: If search fails, return all? or none
-              Menu::m_tempList = inv.getRange(0, inv.getSize());
+              //Menu::m_tempList = inv.getRange(0, inv.getSize());
+              Menu::m_tempList.clear();
           }
 
           pager.setLength(Menu::m_tempList.size());
@@ -268,16 +279,19 @@ int main() {
       case 6: { // case display book list
         // display book list
         // Derive page from current temp list
+        int first = pager.getPageFirst();
+        int  last = pager.getPageLast();
         vector<Book*> current_page(
-          Menu::m_tempList.begin() + pager.getPageFirst(),
-          Menu::m_tempList.begin() + pager.getPageLast()
+          Menu::m_tempList.begin() + first,
+          Menu::m_tempList.begin() + last
         );
         menu_list.displayHeader();
         menu_list.displayBody(current_page);
-        menu_list.displayFooter();
+        menu_list.displayFooter((substate != 0), pager); // If substate
         char temp_input = input.getCh();
 
         switch(temp_input) {// switch user input
+          case 0:
           case 1:
           case 2:
           case 3:
@@ -286,10 +300,12 @@ int main() {
           case 6:
           case 7:
           case 8:
-          case 9:
-          case 10: // case 1-10: user select given book
-            Menu::m_tempBook = current_page[(unsigned) temp_input - 1];
-            state = 10; // switch to last state
+          case 9: // case 1-10: user select given book
+            // If substate is set, then we need to do more work
+            if(substate != 0) {
+              Menu::m_tempBook = current_page[(unsigned) temp_input];
+              state = 10; // switch to substates
+            }
             break;
           case 'n':// case N
           case 'N':// case N
@@ -303,13 +319,16 @@ int main() {
           case 'Q':// case Q
             state = prev_state;// go to previous state
         }
+
+        break;
       }
 
 
       case 7: { // case state add book
-        menu_inv.displayHeader();// create new menu temp book and prompt user for:
-        menu_inv.displayBody();// create new menu temp book and prompt user for:
-        menu_inv.displayFooter();// create new menu temp book and prompt user for:
+         // create new menu temp book and prompt user for:
+        menu_inv.displayHeader();
+        menu_inv.displayBody();
+        menu_inv.displayFooter();
 
         string temp;
         Menu::m_tempBook = new Book;
@@ -343,7 +362,10 @@ int main() {
         quit = true; // set quit to true
         break;
 
-      case 10: // substates
+      case 9: // case dance party
+        break;
+
+      case 10: { // substates
         if (substate == 1) {  // substate delete book
           inv.delBook(Menu::m_tempBook);
 
@@ -363,9 +385,15 @@ int main() {
         }
 
         if (substate == 3) { // substate edit book
-          string temp;
+          menu_edit.displayHeader();
+          menu_edit.displayBody();
+          menu_edit.displayFooter();
 
-          switch(input.getCh()) { // prompt user select field to change
+          char temp_input = input.getCh();
+
+          string temp;
+          cout << "Change to: ";
+          switch(temp_input) { // prompt user select field to change
             case 1: // case 1: isbn
               temp = input.getLine(); // TODO: validate input
               Menu::m_tempBook->setISBN(temp);
@@ -410,24 +438,32 @@ int main() {
               temp = input.getLine();
               Menu::m_tempBook->setQuantity(atoi(temp.c_str()));
               break;
-            case 9: // stop editing
-              // return to last state
+            case 'S':
               inv.updBook(Menu::m_tempBook);
+              // No break statement here, spills over to quit
+            case 'Q': // TODO
+              // Clear buffers
+              Menu::m_tempList.clear();
+              Menu::m_tempBook = NULL;
               state = prev_state;
+              break;
           }
         }
 
         if (substate == 4)  { // substate add to cart
             cash.addCart(Menu::m_tempBook); // add to cart
-            Menu::m_tempBook = NULL; // Clear temp buffer
+
+            // Clear buffers
+            Menu::m_tempList.clear();
+            Menu::m_tempBook = NULL;
             state = prev_state;
         }
 
         if (substate == 5) { // checkout
           //menu_cash.displaycheckout(); // TODO <--- ?
         }
-      default:
-        break;
+      break;
+     }
     }
   }
 

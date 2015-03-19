@@ -8,6 +8,7 @@ using namespace std;
 #include "book.h"
 #include "report.h"
 #include "Cashier.h"
+#include "pager.h"
 
 
 class Menu {
@@ -57,9 +58,23 @@ public:
   //void displayFooter();
 };
 
+class MenuSearch : public Menu {
+public:
+  void displayHeader();
+  void displayBody(); // Accepts a page to list
+  //void displayFooter();
+};
+
 class MenuBookList : public Menu {
 public:
   void displayHeader();
   void displayBody(vector<Book*>&); // Accepts a page to list
-  //void displayFooter();
+  void displayFooter(bool, Pager&);
+};
+
+class MenuEdit : public Menu {
+public:
+  void displayHeader();
+  void displayBody(); // Accepts a page to list
+  void displayFooter();
 };

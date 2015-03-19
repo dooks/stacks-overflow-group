@@ -56,6 +56,7 @@ void Menu::displayFooter() {
   cout << setfill(' ');
   cout << "De Anza CIS22B Winter 2015" << endl;
   cout << "Alfred Ly | James Chantler | Dylan Lotivio" << endl;
+  cout << " :: ";
 }
 
 
@@ -74,35 +75,34 @@ void MenuCashier::displayHeader() {
 }
 
 void MenuCashier::displayBody() {
-  vector<Book*> cart = m_cash.getCart();
+  vector<Book*> cart = m_cash->getCart();
   
   // If there is an item in the cart, display the cart
   if(cart.size() > 0) {
     // Display table header
-    cout  <<  setw(9) << right << "Qty"
-          << setw(15) << right << "ISBN"
-          << setw(25) << right << "Title"
-          << setw(15) << right << "Price"
-          << "Total" << endl;
-    //cout << "________________________________________________________________";
-  
+    cout  <<  setw(4) << right << " Qty"
+          << setw(7) << right << "Price"
+          << setw(2) << ""
+          << setw(100) << left << "Title" << endl;
+
     // Display table
-    for (unsigned i = 0; i < Menu::m_tempList.size(); i++) {
-      cout <<  setw(9) << right << Menu::m_tempList[i]->getQuantity()    // Qty
-           << setw(15) << right << Menu::m_tempList[i]->getISBN()        // ISBN
-           << setw(25) << right << Menu::m_tempList[i]->getTitle()       // Title
-           << setw(15) << right << Menu::m_tempList[i]->getRetailPrice() // Price
-           << setw(15) << right << Menu::m_tempList[i]->getQuantity()    // Total
-                                   * Menu::m_tempList[i]->getRetailPrice();
-      cout << setprecision(2) << fixed;
+    for (unsigned i = 0; i < cart.size(); i++) {
+      cout <<  setw(4) << right << cart[i]->getQuantity()    // Qty
+           << setw(7) << right << cart[i]->getRetailPrice() // Price
+           << setw(2) << ""
+           << setw(50) << left << cart[i]->getTitle();       // Title
+      cout << endl;
     }
-  
-      cout << "Subtotal:"   << setw(30) << right << m_cash->getSubTotal() << endl;
-      cout << "Sales Tax:"  << setw(30) << right << m_cash->getSalesTax() << endl;
-      cout << "Total:"      << setw(30) << right <<
-        m_cash->getSubTotal() + m_cash->getSalesTax() << endl;
-  
-  
+
+    cout << setprecision(2) << fixed;
+    cout << setfill('=') << setw(30) << "" << "\n\n";
+    cout << setfill(' ');
+    cout << setw(20) << right << "Subtotal: " << m_cash->getSubTotal() << endl;
+    cout << setw(20) << right << "Sales Tax:" << m_cash->getSalesTax() << endl;
+    cout << setw(20) << right << "Total:"
+         << m_cash->getSubTotal() + m_cash->getSalesTax() << endl;
+  }
+
   // Instructions
   cout << "\n" << "1: Add a book" << endl;
   cout << "2: Remove a book" << endl;
@@ -140,6 +140,9 @@ void MenuInventory::displaySearchPrompt(){
 
 
 
+
+
+
 //Report Menu Functions
 void MenuReport::displayHeader(){
   system(PCLEAR);
@@ -158,6 +161,26 @@ void MenuReport::displayBody() {
   cout << "7. Return to Main Menu" << endl;
 }
 
+
+// Search Menu
+void MenuSearch::displayHeader(){
+  system(PCLEAR);
+  cout << "Serendipity Booksellers :: Search" << endl;
+  cout << setfill('=') << setw(W_SPACER) << "" << "\n\n";
+  cout << setfill(' ');
+}
+
+void MenuSearch::displayBody() {
+  cout << "Select a field to search for:" << endl;
+  cout << "1. ISBN"             << endl;
+  cout << "2. Author"           << endl;
+  cout << "3. Title"            << endl;
+  cout << "4. Publisher"        << endl;
+  cout << "5. Date Added"       << endl;
+  cout << "6. Wholesale Cost"   << endl;
+  cout << "7. Retail Price"     << endl;
+  cout << "8. Quantity on Hand" << endl;
+}
 
 
 
@@ -179,244 +202,92 @@ void MenuBookList::displayBody(vector<Book*>& current_page) {
   // Display current book list
   for(unsigned i = 0; i < current_page.size(); i++) {
     cout << setprecision(2) << fixed;
-    cout << setw(17) << right << "ISBN"            << current_page[i]->getISBN()        << endl;
-    cout << setw(17) << right << "Title"           << current_page[i]->getTitle()       << endl;
-    cout << setw(17) << right << "Author"          << current_page[i]->getAuthor()      << endl;
-    cout << setw(17) << right << "Publisher"       << current_page[i]->getPublisher()   << endl;
-    cout << setw(17) << right << "Age"             << current_page[i]->getDateAdded().str() << endl;
-    cout << setw(17) << right << "Quantity"        << current_page[i]->getQuantity()    << endl;
-    cout << setw(17) << right << "Wholesale Value" << current_page[i]->getWholeCost()   << endl;
-    cout << setw(17) << right << "Retail Price"    << current_page[i]->getRetailPrice() << endl;
+
+    cout << setw(3) << right << "[" << i << "]";
+    cout << setw(5) << right << "Title: "
+         << setw(50) << left << current_page[i]->getTitle();
+    cout << endl;
+
+    cout << setw(10) << right << "ISBN: "
+         << setw(15) << left << current_page[i]->getISBN();
+    cout << endl;
+
+    cout << setw(10) << right << "Author: "
+         << setw(15) << left << current_page[i]->getAuthor();
+    cout << setw(15) << right << "Publisher: "
+         << setw(25) << left << current_page[i]->getPublisher();
+    cout << endl;
+
+    cout << setw(10) << right << "Age: "
+         << setw(15) << left << current_page[i]->getDateAdded().str();
+    cout << setw(15) << right << "Quantity: "
+         << setw(5) << left << current_page[i]->getQuantity();
+    cout << endl;
+
+    cout << setw(20) << right << "Wholesale Value: " << current_page[i]->getWholeCost()   << endl;
+    cout << setw(20) << right << "Retail Price: "    << current_page[i]->getRetailPrice() << endl;
+    cout << endl;
   }
 }
 
-/*
-//void MainMenu::Menu1(int)
-//{
-//  userchoice = 0;
-//  cout << "Welcome to Serendipity Booksellers!"<<endl<<endl;
-//
-//  cout << "1. Cashier Module" << endl;
-//  cout << "2. Inventory Module" << endl;
-//  cout << "3. Report Module" << endl;
-//  cout << "4. Quit the program" << endl;
-//  cout << "Please enter your choice found above:" << endl;
-//  cin >> userchoice;
-//  cout << endl;
-//}
-//
-//void MainMenu::CashMenu1(int)
-//{
-//  Cashchoice = 0;
-//  system(PCLEAR);
-//  cout << "Welcome to the Serendipity Booksellers Cash Register!" <<endl<<endl;
-//
-//  cout << "1. Search for a book via ISBN" << endl;
-//  cout << "2. Search for a book via Author" << endl;
-//  cout << "3. Search for a book via Title" << endl;
-//  cout << "4. Remove a book from this transaction" << endl;
-//  cout << "5. Finalize your transaction" << endl;
-//  cout << "6. Return to the Main Menu" << endl;
-//  cout << "Please enter your choice found above:" << endl;
-//  cin >> Cashchoice;
-//}
-//
-//void MainMenu::InvMenu1(int)
-//{
-//  Invchoice = 0;
-//  system(PCLEAR);
-//  cout << "Welcome to the Serendipity Booksellers Inventory System!" << endl << endl;
-//  cout << "1. Look up a book"<<endl;
-//  cout << "2. Add a book"<<endl;
-//  cout << "3. Edit a book's record"<<endl;
-//  cout << "4. Delete a book" << endl;
-//  cout << "5. Return to the Main Menu" << endl;
-//  cout << "Please enter your choice found above:" << endl;
-//  cin >> Invchoice;
-//}
-//
-//void MainMenu::ReportMenu1(int)
-//{
-//  Repchoice = 0;
-//  system(PCLEAR);
-//  cout << "Welcome to the Serendipity Booksellers Report Module!" << endl << endl;
-//  cout << "1. Inventory Listing" << endl;
-//  cout << "2. Inventory Wholesale Listing" << endl;
-//  cout << "3. Inventory Retail Listing" << endl;
-//  cout << "4. List by quantity" <<
-//}
-//
-//void MainMenu::CashMenuISBN()
-//{
-//  cout << "Please enter the ISBN: " << endl;
-//  cin.clear();
-//  fflush(stdin);
-//  std::getline(std::cin, userisbn);
-//
-//  //function call to search for isbn
-//  cout << "   ISBN            Title               Author            Price " << endl;
-//  vector<Book*> isbnlist = m_cash.findISBN(userisbn);
-//  for (unsigned i = 0; i < isbnlist.size(); i++)  {
-//    cout << "";
-//    cout <<i+1<<". "<< isbnlist[i]->getISBN() << "    "
-//      << isbnlist[i]->getTitle() << "     ";
-//    cout << isbnlist[i]->getAuthor() << "     $"
-//      << isbnlist[i]->getRetailPrice() << endl;
-//
-//  }
-//  cout << "Please type the number of the selection you'd like to add to your cart:" << endl;
-//  cin >> cartchoice;
-//  cartchoice = cartchoice - 1;
-//  if (cartchoice>isbnlist.size())
-//  {
-//    cout << "There is no such selection. Please try again:" << endl;
-//    cin >> cartchoice;
-//  }
-//  m_cash.addCart(isbnlist[cartchoice]);
-//
-//  /*vector<Book*> cart = m_cash.findISBN(userisbn);
-//  Book* book = cart[0];
-//  for (unsigned i = 0; i < cart.size(); i++) {
-//    if (cartchoice == i)
-//    {
-//
-//  m_cash.addCart(book);
-//
-//    }
-//  }
-//  cout << cartchoice << endl;
-//  for (unsigned i = 0; i < cart.size(); i++)  {
-//    cout << "";
-//    cout << i + 1 << ". " << cart[i]->getISBN() << "    "
-//      << cart[i]->getTitle() << "     ";
-//    cout << cart[i]->getAuthor() << "     $"
-//      << cart[i]->getRetailPrice() << endl;
-//
-//  }*/
-//  cout << "Your selection has been added to your cart" << endl;
-//  //cout << 1. \n 2. \n  3. \n 4. \n 5. vector search results=true
-//  //Please type the number of the selection you'd like to make.
-//  system("pause");
-//  MainMenu::CashMenu1(userchoice);
-//
-//}
-//
-//void MainMenu::CashMenuAuth(string)
-//{
-//  cout << "Please enter the author's name, last name first: " << endl;
-//  cin.clear();
-//  fflush(stdin);
-//  std::getline(std::cin, userauth);
-//
-//  //function call to search for author
-//  cout << "ISBN         Title        Author      Price " << endl;
-//  vector<Book*> authlist = m_cash.findAuthor(userauth);
-//  for (unsigned i = 0; i < authlist.size(); i++)  {
-//    cout << "";
-//    cout << i + 1 << ". " << authlist[i]->getISBN() << "    "
-//      << authlist[i]->getTitle() << "     ";
-//    cout << authlist[i]->getAuthor() << "     $"
-//      << authlist[i]->getRetailPrice() << endl;
-//    cout << i << endl;
-//    cout << userisbn << endl;
-//
-//  }
-//  cout << "Please type the number of the selection you'd like to add to your cart:" << endl;
-//  cin >> cartchoice;
-//  cartchoice = cartchoice - 1;
-//
-//
-//  vector<Book*> cart = m_cash.findAuthor(userauth);
-//  Book* book = cart[0];
-//  for (unsigned i = 0; i < cart.size(); i++) {
-//    if (cartchoice == i)
-//    {
-//
-//      m_cash.addCart(book);
-//
-//    }
-//  }
-//  cout << cartchoice << endl;
-//  /*for (unsigned i = 0; i < cart.size(); i++)  {
-//  cout << "";
-//  cout << i + 1 << ". " << cart[i]->getISBN() << "    "
-//  << cart[i]->getTitle() << "     ";
-//  cout << cart[i]->getAuthor() << "     $"
-//  << cart[i]->getRetailPrice() << endl;
-//
-//  }*/
-//  cout << "Your selection has been added to your cart" << endl;
-//  //cout << 1. \n 2. \n  3. \n 4. \n 5. vector search results=true
-//  //Please type the number of the selection you'd like to make.
-//  system("pause");
-//
-//
-//}
-//
-//void MainMenu::CashMenuTitle(string)
-//{
-//  cout << "Please enter the title: " << endl;
-//  cin.clear();
-//  fflush(stdin);
-//  std::getline(std::cin, usertitle);
-//
-//  //function call to search for author
-//  cout << "ISBN         Title        Author      Price " << endl;
-//  vector<Book*> titlelist = m_cash.findAuthor(usertitle);
-//  for (unsigned i = 0; i < titlelist.size(); i++)  {
-//    cout << "";
-//    cout << i + 1 << ". " << titlelist[i]->getISBN() << "    "
-//      << titlelist[i]->getTitle() << "     ";
-//    cout << titlelist[i]->getAuthor() << "     $"
-//      << titlelist[i]->getRetailPrice() << endl;
-//
-//
-//  }
-//  cout << "Please type the number of the selection you'd like to add to your cart:" << endl;
-//  cin >> cartchoice;
-//  cartchoice = cartchoice - 1;
-//
-//
-//  vector<Book*> cart = m_cash.findTitle(usertitle);
-//  Book* book = cart[0];
-//  for (unsigned i = 0; i < cart.size(); i++) {
-//    if (cartchoice == i)
-//    {
-//
-//      m_cash.addCart(book);
-//
-//    }
-//  }
-//  cout << cartchoice << endl;
-//  /*for (unsigned i = 0; i < cart.size(); i++)  {
-//  cout << "";
-//  cout << i + 1 << ". " << cart[i]->getISBN() << "    "
-//  << cart[i]->getTitle() << "     ";
-//  cout << cart[i]->getAuthor() << "     $"
-//  << cart[i]->getRetailPrice() << endl;
-//
-//  }*/
-//  cout << "Your selection has been added to your cart" << endl;
-//  //cout << 1. \n 2. \n  3. \n 4. \n 5. vector search results=true
-//  //Please type the number of the selection you'd like to make.
-//
-//
-//}
-//
-//void MainMenu::CartRemove(string)
-//{
-//  cout << "Please enter the title of the book you'd like to remove from your cart:" << endl;
-//  cin >> usertitle;
-//  /*for (unsigned i = 0; i < cart.size(); i++) {
-//    if (usertitle == cart.getTitle())
-//    {
-//
-//      m_cash.delCart(book);
-//
-//    }
-//  }
-//  */
-//}
-//
-//void MainMenu::BuyBooks(double)
-//{}
+void MenuBookList::displayFooter(bool sub, Pager& page ) { // If substate, show options to select book
+  cout << "\n" << setfill('=') << setw(W_SPACER) << "" << endl;
+  cout << setfill(' ');
+  if(sub) {
+    cout << "'0-9': Select book" << endl;
+  }
+
+  cout << "Page : " << page.getPageCurrent() << "/" << page.getPageTotal()-1 << endl;
+  cout << "'N': Next page" << endl;
+  cout << "'P': Prev page" << endl;
+  cout << "'Q': Quit page" << endl;
+  cout << " :: ";
+}
+
+
+void MenuEdit::displayHeader(){
+  system(PCLEAR);
+  cout << "Serendipity Booksellers :: Edit book" << endl;
+  cout << setfill('=') << setw(W_SPACER) << "" << "\n\n";
+  cout << setfill(' ');
+}
+
+void MenuEdit::displayBody() {
+  // Display current book with field numbers
+
+  cout << setw(20) << right << "[0] ISBN: "
+       << setw(50) << left << Menu::m_tempBook->getISBN() << endl;
+  cout << setw(20) << right << "[1] Title: "
+       << setw(50) << left << Menu::m_tempBook->getTitle() << endl;
+  cout << setw(20) << right << "[2] Author: "
+       << setw(50) << left << Menu::m_tempBook->getAuthor() << endl;
+  cout << setw(20) << right << "[3] Publisher: "
+       << setw(50) << left << Menu::m_tempBook->getPublisher() << endl;
+  cout << setw(20) << right << "[4] Age: "
+       << setw(50) << left << Menu::m_tempBook->getDateAdded().str() << endl;
+  cout << setw(20) << right << "[5] Quantity: "
+       << setw(50) << left << Menu::m_tempBook->getQuantity() << endl;
+  cout << setw(20) << right << "[6] Wholesale Cost: "
+       << setw(50) << left << Menu::m_tempBook->getWholeCost() << endl;
+  cout << setw(20) << right << "[7] Retail Price: "
+       << setw(50) << left << Menu::m_tempBook->getRetailPrice() << endl;
+
+  //cout << " Title: " << setw(50) << Menu::m_tempBook->getTitle();
+  //cout << " ISBN: " << setw(50) << Menu::m_tempBook->getTitle();
+  //cout << " Author: " << setw(50) << Menu::m_tempBook->getTitle();
+  //cout << " Publisher: " << setw(50) << Menu::m_tempBook->getTitle();
+  //cout << " Age: " << setw(50) << Menu::m_tempBook->getTitle();
+  //cout << " Quantity: " << setw(50) << Menu::m_tempBook->getTitle();
+  //cout << " Wholesale Cost: " << setw(50) << Menu::m_tempBook->getTitle();
+  //cout << " Retail Price: " << setw(50) << Menu::m_tempBook->getTitle();
+}
+
+void MenuEdit::displayFooter() { // If substate, show options to select book
+  cout << "\n" << setfill('=') << setw(W_SPACER) << "" << endl;
+  cout << setfill(' ');
+
+  cout << "[0-7]: Edit field" << endl;
+  cout << "'S': save and quit" << endl;
+  cout << "'Q': discard changes" << endl;
+  cout << " :: ";
+}

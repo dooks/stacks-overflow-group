@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "date.h"
 using namespace std;
 
@@ -29,11 +30,10 @@ int date::getMonth() { return m_month; }
 int   date::getDay() {   return m_day; }
 int  date::getYear() {  return m_year; }
 string date::str() {
-  string d = ""; // Create temp string
-  d += m_month;
-  d += "/" + m_day;
-  d += "/" + m_year; // Serialize date into string
-  return d;
+  ostringstream os;
+  os << m_month << "/" << m_day << "/" << m_year;
+  string retval = os.str();
+  return retval;
 }
 
 // Comparison operators

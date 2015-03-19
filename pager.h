@@ -22,7 +22,8 @@ public:
   void    movePage(dir); // Pages left/right
 
   // Accessors
-  int getPageNumber(); // Current page number
+  int getPageTotal();   // Get number of pages
+  int getPageCurrent(); // Current page number
   int getCursor();     // Get position of cursor on current page
   int getPageFirst();  // Get number of item at start of current page
   int getPageLast();   // Get number of item at end of current page

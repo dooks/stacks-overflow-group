@@ -29,8 +29,7 @@ bool Inventory::addBook(Book* book) {
 
     // ISBN numbers are unique (or should be...): search if exists
     // Only add to FIRST book found
-    string isbn = book->getISBN();
-    vector<Book*> search = findBook(Book::ISBN, &isbn);
+    vector<Book*> search = findBook(Book::ISBN, &(book->getISBN()));
     if(search.empty()) {
       // Add book to list, for writing to file later
       m_addList.push_back(book);
