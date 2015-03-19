@@ -261,7 +261,7 @@ int main() {
               }
             case 8: { // case 8: quantity
               temp = input.getLine();
-              double itemp = atoi(temp.c_str());
+              int itemp = atoi(temp.c_str());
               Menu::m_tempList = inv.findBook(Book::QUANTITY, &itemp);
               break;
               }

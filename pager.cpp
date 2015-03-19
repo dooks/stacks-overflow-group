@@ -51,7 +51,6 @@ void Pager::setLength(int length) {
   // Resize total number of items
   m_cursor      = 0;
   m_pageNumber  = 0;
-  m_pageSize    = m_pageSize;
   m_numElements = length;
 }
 
