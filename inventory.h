@@ -6,7 +6,7 @@
 using std::string;
 using std::vector;
 
-#define DEFAULT_INV_FILE "tools/books.db"
+#define DEFAULT_INV_FILE "books.db"
 
 class Inventory {
   vector<Book*>  m_bookList;
