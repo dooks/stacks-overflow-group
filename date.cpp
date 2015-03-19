@@ -1,5 +1,7 @@
+#include <iostream>
+#include <sstream>
 #include "date.h"
-using std::string;
+using namespace std;
 
 // Constructors
 date::date() : m_month(0), m_day(0), m_year(0) { }
@@ -11,17 +13,27 @@ date::date(int mm, int dd, int yyyy) : // Initialize with MM-DD-YYYY format
 void date::setMonth(int month) { m_month = month; }
 void   date::setDay(int   day) {   m_day =   day; }
 void  date::setYear(int  year) {  m_year =  year; }
+void date::operator=(const date& op) {
+  m_month = op.m_month;
+    m_day = op.m_day;
+   m_year = op.m_year;
+}
+
+ostream& operator<<(ostream& os, date& obj) {
+  string retval = obj.str();
+  os << retval;
+  return os;
+}
 
 // Accessors
 int date::getMonth() { return m_month; }
 int   date::getDay() {   return m_day; }
 int  date::getYear() {  return m_year; }
 string date::str() {
-  string d = ""; // Create temp string
-  d += m_month;
-  d += "/" + m_day;
-  d += "/" + m_year; // Serialize date into string
-  return d;
+  ostringstream os;
+  os << m_month << "/" << m_day << "/" << m_year;
+  string retval = os.str();
+  return retval;
 }
 
 // Comparison operators

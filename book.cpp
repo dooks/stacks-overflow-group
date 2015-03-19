@@ -1,12 +1,14 @@
-#include <cstdlib>
-#include <cstring>
+#include <iostream>
+#include <stdio.h>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <deque>
 #include "date.h"
 using namespace std;
 
 #include "book.h"
+
 
 // BookPoolSub
 BookPoolSub::BookPoolSub(size_t size, size_t size_class) {
@@ -171,24 +173,24 @@ void Book::operator=(const Book& o) {
 }
 Book::~Book() {}
 
-void* Book::operator new(size_t size) {
-  try {
-    return BookPool::Allocate(size);
-  } catch(exception& e) {
-    cerr << "Book::operator new: " << e.what() << endl;
-    return NULL;
-  }
-}
+//void* Book::operator new(size_t size) {
+  //try {
+    //return BookPool::Allocate(size);
+  //} catch(exception& e) {
+    //cerr << "Book::operator new: " << e.what() << endl;
+    //return NULL;
+  //}
+//}
 
-void Book::operator delete(void* ptr) {
-  try {
-    BookPool::Free(ptr);
-  } catch(exception& e)  {
-    // Immediately throw exception
-    cerr << "Book::operator delete: " << e.what() << endl;
-    throw e;
-  }
-}
+//void Book::operator delete(void* ptr) {
+  //try {
+    //BookPool::Free(ptr);
+  //} catch(exception& e)  {
+    //// Immediately throw exception
+    //cerr << "Book::operator delete: " << e.what() << endl;
+    //throw e;
+  //}
+//}
 
 void Book::setFileIndex(unsigned idx) { m_index = idx;        }
 void Book::setISBN(string isbn)    {
@@ -200,6 +202,9 @@ void Book::setPublisher(string publisher) {
   strcpy_s(m_publisher, publisher.c_str());
 }
 void Book::setQuantity(int quantity) { m_quantity = quantity; }
+void Book::setDateAdded(date& tdate) {
+  m_dateAdded = tdate;
+}
 void Book::setDateAdded(int month, int day, int year) {
   m_dateAdded.setMonth(month);
       m_dateAdded.setDay(day);

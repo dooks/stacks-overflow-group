@@ -200,6 +200,8 @@ vector<Book*> Inventory::findBook(Book::field field, void* search) {
       case Book::ISBN:
       case Book::TITLE:
       case Book::AUTHOR:
+      case Book::PUBLISHER:
+      case Book::DATEADDED:
         exp.assign( *( (string*) search ), regex_constants::icase );
         break;
     }
@@ -221,6 +223,10 @@ vector<Book*> Inventory::findBook(Book::field field, void* search) {
           if(regex_search(book->getAuthor(), match, exp))
             retval.push_back(book);
           break;
+        case Book::PUBLISHER:
+          if(regex_search(book->getPublisher(), match, exp))
+            retval.push_back(book);
+          break;
         case Book::QUANTITY:
           if(book->getQuantity() == *((int*) search))
             retval.push_back(book);
@@ -234,7 +240,9 @@ vector<Book*> Inventory::findBook(Book::field field, void* search) {
             retval.push_back(book);
           break;
         case Book::DATEADDED:
-          if(book->getDateAdded() == *((date*) search))
+          //if(book->getDateAdded() == *((date*) search))
+            //retval.push_back(book);
+          if(regex_search(book->getDateAdded().str(), match, exp))
             retval.push_back(book);
           break;
         default:
