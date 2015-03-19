@@ -95,11 +95,10 @@ void MenuCashier::displayBody() {
     }
 
     cout << setprecision(2) << fixed;
-    cout << setfill('=') << setw(30) << "" << "\n\n";
-    cout << setfill(' ');
+    cout << setfill('=') << setw(30) << "" << setfill(' ') << endl;
     cout << setw(20) << right << "Subtotal: " << m_cash->getSubTotal() << endl;
-    cout << setw(20) << right << "Sales Tax:" << m_cash->getSalesTax() << endl;
-    cout << setw(20) << right << "Total:"
+    cout << setw(20) << right << "Sales Tax: " << m_cash->getSalesTax() << endl;
+    cout << setw(20) << right << "Total: "
          << m_cash->getSubTotal() + m_cash->getSalesTax() << endl;
   }
 

@@ -9,9 +9,6 @@ using namespace std;
 
 #include "book.h"
 
-#ifdef __GNUC__
-  #define strcpy_s strcpy
-#endif
 
 // BookPoolSub
 BookPoolSub::BookPoolSub(size_t size, size_t size_class) {

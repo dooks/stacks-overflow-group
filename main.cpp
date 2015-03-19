@@ -126,15 +126,16 @@ int main() {
             break;
           case 2: // case 2: remove book
             Menu::m_tempList = cash.getCart(); // Change active list to cart
+            pager.setLength(Menu::m_tempList.size());
             state      = 6; // switch state to substate (only removing from cart)
             substate   = 2; // switch substate to delete book(cart)
             break;
           case 3: // case 3: finalize transaction
-            state      = 6; // switch state to display book list
+            //state      = 6; // switch state to display book list
             substate   = 5; // switch substate to checkout
             break;
           case 4: // case 4: return to main menu
-            state      = 1;// switch state to main menu
+            state      = 1; // switch state to main menu
             break;
           // TODO: default behavior
         }
@@ -283,7 +284,7 @@ int main() {
         int  last = pager.getPageLast();
         vector<Book*> current_page(
           Menu::m_tempList.begin() + first,
-          Menu::m_tempList.begin() + last
+          Menu::m_tempList.begin() + last + 1
         );
         menu_list.displayHeader();
         menu_list.displayBody(current_page);
@@ -394,22 +395,23 @@ int main() {
           string temp;
           cout << "Change to: ";
           switch(temp_input) { // prompt user select field to change
-            case 1: // case 1: isbn
+            case 0: // case 1: isbn
               temp = input.getLine(); // TODO: validate input
               Menu::m_tempBook->setISBN(temp);
               break;
-            case 2: // case 2: author
+            case 1: // case 2: author
               temp = input.getLine(); // TODO: validate input
               Menu::m_tempBook->setAuthor(temp);
-            case 3:// case 3: title
+              break;
+            case 2:// case 3: title
               temp = input.getLine();
               Menu::m_tempBook->setTitle(temp);
               break;
-            case 4: // case 4: publisher
+            case 3: // case 4: publisher
               temp = input.getLine();
               Menu::m_tempBook->setPublisher(temp);
               break;
-            case 5: { // case 5: date added
+            case 4: { // case 5: date added
               date dtemp;
 
               cout << "Month: ";
@@ -426,6 +428,10 @@ int main() {
               Menu::m_tempBook->setDateAdded(dtemp);
               break;
               }
+            case 5: // case 8: quantity
+              temp = input.getLine();
+              Menu::m_tempBook->setQuantity(atoi(temp.c_str()));
+              break;
             case 6: // case 6: wholesale price
               temp = input.getLine();
               Menu::m_tempBook->setWholeCost(atof(temp.c_str()));
@@ -433,10 +439,6 @@ int main() {
             case 7: // case 7: retail price
               temp = input.getLine();
               Menu::m_tempBook->setRetailPrice(atof(temp.c_str()));
-              break;
-            case 8: // case 8: quantity
-              temp = input.getLine();
-              Menu::m_tempBook->setQuantity(atoi(temp.c_str()));
               break;
             case 'S':
               inv.updBook(Menu::m_tempBook);
