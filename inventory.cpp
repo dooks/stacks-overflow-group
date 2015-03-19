@@ -28,12 +28,14 @@ bool Inventory::addBook(Book* book) {
     if(book == NULL) throw domain_error("Domain Error: Argument is NULL");
 
     // ISBN numbers are unique (or should be...): search if exists
-    // Only add to FIRST book found
-    vector<Book*> search = findBook(Book::ISBN, &(book->getISBN()));
+    string isbn = book->getISBN();
+    vector<Book*> search = findBook(Book::ISBN, &isbn);
+
     if(search.empty()) {
       // Add book to list, for writing to file later
       m_addList.push_back(book);
     } else {
+      // Only add to FIRST book found
       // Change quantity of found book
       search[0]->setQuantity( search[0]->getQuantity() + 1);
       // Mark book for update
@@ -95,7 +97,7 @@ bool Inventory::sync() {
       temp->setQuantity( temp->getQuantity() - 1 );
       if(temp->getQuantity() <= 0) {
         // Remove from database entirely
-        //if(!m_db->remove(temp)) throw runtime_error("Could not remove from database");
+        if(!m_db->remove(temp)) throw runtime_error("Could not remove from database");
       } else {
         updBook(temp); // Add to delta list
       }
@@ -106,7 +108,7 @@ bool Inventory::sync() {
       // Find book by index
       Book* temp = getBook(m_deltaList[i]);
       // Write book to record
-      //if(!m_db->change(temp)) throw runtime_error("Could not modify database");
+      if(!m_db->change(temp)) throw runtime_error("Could not modify database");
     }
 
     // for elements in add list
@@ -114,7 +116,7 @@ bool Inventory::sync() {
       // Push element to book list
       m_bookList.push_back(m_addList[i]);
       // Write book to database
-      //if(!m_db->add(m_addList[i])) throw runtime_error("Could not add to database");
+      if(!m_db->add(m_addList[i])) throw runtime_error("Could not add to database");
     }
     m_db->close();
 

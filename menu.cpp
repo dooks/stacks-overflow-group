@@ -163,7 +163,8 @@ void MenuInventory::displayBody() {
   cout << "3. Edit a book's record" << endl;
   cout << "4. Delete a book" << endl;
   cout << "5. Write changes to inventory" << endl;
-  cout << "6. Return to Main Menu" << endl;
+  cout << "6. Discard current changes" << endl;
+  cout << "7. Return to Main Menu" << endl;
 }
 void MenuInventory::displaySearchPrompt(){
   cout << "Please enter your search term here: "<< endl;

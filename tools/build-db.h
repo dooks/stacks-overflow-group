@@ -8,7 +8,7 @@
 #include "../book.h"
 using namespace std;
 
-int main() {
+void buildDB() {
   srand((unsigned) time(NULL)); // Seed RNG
 
   vector<Book*> temp_list;
@@ -53,18 +53,6 @@ int main() {
     temp_list.push_back(book); // Push book into temp_list
   }
 
-  // Print out all books to make sure we have everything...
-  //for(int i = 0; i < (int) temp_list.size(); i++) {
-    //cout << temp_list[i]->getISBN()        << " : ";
-    //cout << temp_list[i]->getTitle()       << " : ";
-    //cout << temp_list[i]->getAuthor()      << " : ";
-    //cout << temp_list[i]->getPublisher()   << " : ";
-    //cout << (temp_list[i]->getDateAdded()).str() << " : ";
-    //cout << temp_list[i]->getQuantity()    << " : ";
-    //cout << temp_list[i]->getWholeCost()   << " : ";
-    //cout << temp_list[i]->getRetailPrice() << endl;
-  //}
-
   // Open database for reading/writing
   db_local.open("books.db");
   for(int i = 0; i < (int) temp_list.size(); i++) {
@@ -77,5 +65,4 @@ int main() {
   }
 
   system("pause");
-  return 0;
 }
