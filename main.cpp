@@ -112,8 +112,6 @@ int main() {
         break;
 
       case 2: // case state cashier module
-        vector<Book*> = cash.getCart(); // Set temp list to cart
-        
         menu_cash.displayHeader(); // display cashier menu
         menu_cash.displayBody();
         menu_cash.displayFooter();
@@ -215,8 +213,8 @@ int main() {
       case 5: { // case state book search
           //menu_search.displayBody();    // display search body
           //menu_search.displayPrompt();  // prompt user for which field to search fo
-          void Menu_inv.displaySearchPrompt();
           string temp;
+          menudi
 
           switch(input.getCh()) { // prompt user select field to change
             case 1: // case 1: isbn
@@ -265,7 +263,7 @@ int main() {
           state = 6;// set state to display book list
 
           break;
-          }
+      }
 
       case 6: { // case display book list
         // display book list
@@ -305,6 +303,7 @@ int main() {
           case 'Q':// case Q
             state = prev_state;// go to previous state
         }
+      }
 
 
       case 7: { // case state add book
@@ -338,12 +337,12 @@ int main() {
 
         state=prev_state;// return to last state
         break;
+      }
 
-        }
       case 8: // case quit
         quit = true; // set quit to true
         break;
-        
+
       case 10: // substates
         if (substate == 1) {  // substate delete book
           inv.delBook(Menu::m_tempBook);
@@ -352,7 +351,8 @@ int main() {
           Menu::m_tempList.clear();
           Menu::m_tempBook = NULL;
           state = prev_state;
-          }
+        }
+
         if (substate == 2) {  // substate remove from cart
           cash.delCart(Menu::m_tempBook);
 
@@ -410,24 +410,24 @@ int main() {
               temp = input.getLine();
               Menu::m_tempBook->setQuantity(atoi(temp.c_str()));
               break;
+            case 9: // stop editing
+              // return to last state
+              inv.updBook(Menu::m_tempBook);
+              state = prev_state;
           }
-          // return to last state
-          state = prev_state;
         }
 
         if (substate == 4)  { // substate add to cart
             cash.addCart(Menu::m_tempBook); // add to cart
             Menu::m_tempBook = NULL; // Clear temp buffer
+            state = prev_state;
         }
 
-        if (substate == 5) // checkout
-        {
-          menu_cash.displaycheckout();//menu_cash.displaycheckout(); // TODO <--- ?
+        if (substate == 5) { // checkout
+          //menu_cash.displaycheckout(); // TODO <--- ?
         }
-
-        substate=0; // Clear substate
+      default:
         break;
-        }
     }
   }
 
